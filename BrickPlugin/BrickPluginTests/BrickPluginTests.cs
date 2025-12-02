@@ -7,6 +7,7 @@ namespace BrickPlugin.Tests
     [TestClass]
     public class BrickParameterTests
     {
+        //TODO: description
         [TestMethod]
         public void Constructor_SetsValuesCorrectly()
         {
@@ -16,6 +17,7 @@ namespace BrickPlugin.Tests
             Assert.AreEqual(50, param.Value);
         }
 
+        //TODO: description
         [TestMethod]
         public void IsValid_ReturnsTrueForValueInRange()
         {
@@ -23,6 +25,7 @@ namespace BrickPlugin.Tests
             Assert.IsTrue(param.IsValid());
         }
 
+        //TODO: description
         [TestMethod]
         public void IsValid_ReturnsFalseForValueBelowMin()
         {
@@ -37,6 +40,7 @@ namespace BrickPlugin.Tests
             Assert.IsFalse(param.IsValid());
         }
 
+        //TODO: description
         [TestMethod]
         public void IsValid_ReturnsTrueForValueEqualToMin()
         {
@@ -44,6 +48,7 @@ namespace BrickPlugin.Tests
             Assert.IsTrue(param.IsValid());
         }
 
+        //TODO: description
         [TestMethod]
         public void IsValid_ReturnsTrueForValueEqualToMax()
         {
@@ -59,6 +64,7 @@ namespace BrickPlugin.Tests
             Assert.AreEqual(75, param.Value);
         }
 
+        //TODO: description
         [TestMethod]
         public void MaxValue_CanBeChanged()
         {
@@ -68,6 +74,7 @@ namespace BrickPlugin.Tests
         }
     }
 
+    //TODO: RSDN
     [TestClass]
     public class BrickParametersTests
     {

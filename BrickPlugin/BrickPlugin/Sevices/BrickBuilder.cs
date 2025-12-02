@@ -4,8 +4,10 @@ using Kompas6API5;
 
 namespace BrickPlugin.Services
 {
+    //TODO: XML
     public class BrickBuilder
     {
+        //TODO: raname
         private readonly KompasWrapper _k;
 
         public BrickBuilder()
@@ -13,6 +15,7 @@ namespace BrickPlugin.Services
             _k = new KompasWrapper();
         }
 
+        //TODO: RSDN
         public void Build(BrickParameters p)
         {
             _k.OpenKompas();
@@ -23,6 +26,7 @@ namespace BrickPlugin.Services
 
         private void BuildBody(BrickParameters p)
         {
+            //TODO: RSDN
             double L = p[ParameterType.Length];
             double W = p[ParameterType.Width];
             double H = p[ParameterType.Height];
@@ -70,8 +74,10 @@ namespace BrickPlugin.Services
             _k.Cut(sketch);
         }
 
+        //TODO: RSDN
         private void PlaceHoles(ksDocument2D d2, int count, double radius, double length, double width)
         {
+            //TODO: duplication
             double diameter = 2 * radius;
             double edgeMargin = Math.Max(2 * radius, 10);
             double minGap = Math.Max(1.5 * radius, 5);
@@ -84,7 +90,7 @@ namespace BrickPlugin.Services
                 d2.ksCircle(0, 0, radius, 1);
                 return;
             }
-
+            //TODO: RSDN
             int maxPerRow = (int)Math.Floor((availableLength + minGap) / (diameter + minGap));
             int maxRows = (int)Math.Floor((availableWidth + minGap) / (diameter + minGap));
 
@@ -132,6 +138,7 @@ namespace BrickPlugin.Services
             }
         }
 
+        //TODO: RSDN
         private int DetermineRowCount(int totalHoles, int maxPerRow, int maxRows)
         {
             int minRows = (int)Math.Ceiling((double)totalHoles / maxPerRow);

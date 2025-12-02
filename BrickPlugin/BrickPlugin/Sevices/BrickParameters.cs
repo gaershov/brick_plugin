@@ -5,6 +5,7 @@ using BrickPlugin.Models;
 
 namespace BrickPlugin.Services
 {
+    //TODO: XML
     public class BrickParameters
     {
         private readonly Dictionary<ParameterType, BrickParameter> _parameters;
@@ -45,6 +46,7 @@ namespace BrickPlugin.Services
         public string GetMaxRadiusHint()
         {
             var width = _parameters[ParameterType.Width].Value;
+            //TODO: duplication
             double maxRadius = width * 0.25;
             return $"Макс: {maxRadius:F1} мм";
         }
@@ -62,6 +64,7 @@ namespace BrickPlugin.Services
             var width = _parameters[ParameterType.Width].Value;
             var holeRadius = _parameters[ParameterType.HoleRadius].Value;
 
+            //TODO: duplication
             double maxRadius = width * 0.25;
             _parameters[ParameterType.HoleRadius].MaxValue = maxRadius;
 
@@ -88,6 +91,7 @@ namespace BrickPlugin.Services
             {
                 if (!kvp.Value.IsValid())
                 {
+                    //TODO: RSDN
                     errorMessages.Add($"• {GetParameterDisplayName(kvp.Key)}: " +
                         $"должно быть в диапазоне [{kvp.Value.MinValue:F0}, {kvp.Value.MaxValue:F0}]");
                 }
@@ -119,6 +123,7 @@ namespace BrickPlugin.Services
             var holeRadius = _parameters[ParameterType.HoleRadius].Value;
             var holesCount = (int)_parameters[ParameterType.HolesCount].Value;
 
+            //TODO: duplication
             if (holeRadius > width * 0.25)
             {
                 errorMessage = "• Радиус отверстий превышает 25% от ширины";
@@ -140,6 +145,7 @@ namespace BrickPlugin.Services
 
         private double CalculateMaxHoles(double length, double width, double holeRadius)
         {
+            //TODO: duplication?
             double diameter = 2 * holeRadius;
             double edgeMargin = Math.Max(2 * holeRadius, 10);
             double minGap = Math.Max(1.5 * holeRadius, 5);

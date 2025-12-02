@@ -1,5 +1,6 @@
 ﻿namespace BrickPlugin.Models
 {
+    //TODO: XML
     public enum ParameterType
     {
         Length,

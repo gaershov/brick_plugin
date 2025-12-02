@@ -7,6 +7,7 @@ using BrickPlugin.Services;
 
 namespace BrickPlugin
 {
+    //TODO: XML
     public partial class MainForm : Form
     {
         private BrickBuilder _builder;
