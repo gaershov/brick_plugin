@@ -5,7 +5,7 @@ VisualStudioVersion = 17.14.36518.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrickPlugin", "BrickPlugin\BrickPlugin.csproj", "{5CA03D98-01D1-4FAB-8215-A3286723CA0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrickPluginTests", "BrickPluginTests\BrickPluginTests.csproj", "{B08592B7-F78D-428C-A896-2E62AF716A84}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrickPlugin.Tests", "BrickPlugin.Tests\BrickPlugin.Tests.csproj", "{C6779A44-2445-483A-928E-257B155FA100}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{5CA03D98-01D1-4FAB-8215-A3286723CA0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CA03D98-01D1-4FAB-8215-A3286723CA0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5CA03D98-01D1-4FAB-8215-A3286723CA0F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B08592B7-F78D-428C-A896-2E62AF716A84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B08592B7-F78D-428C-A896-2E62AF716A84}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B08592B7-F78D-428C-A896-2E62AF716A84}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B08592B7-F78D-428C-A896-2E62AF716A84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6779A44-2445-483A-928E-257B155FA100}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6779A44-2445-483A-928E-257B155FA100}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6779A44-2445-483A-928E-257B155FA100}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6779A44-2445-483A-928E-257B155FA100}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

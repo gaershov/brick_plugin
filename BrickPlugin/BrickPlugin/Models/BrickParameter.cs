@@ -1,49 +1,74 @@
 ﻿namespace BrickPlugin.Models
 {
-    //TODO: XML
+    /// <summary>
+    /// Представляет параметр кирпича с ограничениями по минимальному и максимальному значению.
+    /// </summary>
     public class BrickParameter
     {
-        //TODO: XML
+        /// <summary>
+        /// Текущее значение параметра.
+        /// </summary>
         private double _value;
 
-        //TODO: XML
+        /// <summary>
+        /// Минимальное допустимое значение параметра.
+        /// </summary>
         private double _minValue;
 
-        //TODO: XML
+        /// <summary>
+        /// Максимальное допустимое значение параметра.
+        /// </summary>
         private double _maxValue;
 
-        //TODO: XML
-        public BrickParameter(double minValue, double maxValue, double defaultValue)
+        /// <summary>
+        /// Инициализирует новый экземпляр класса BrickParameter.
+        /// </summary>
+        /// <param name="minValue">Минимальное значение.</param>
+        /// <param name="maxValue">Максимальное значение.</param>
+        /// <param name="defaultValue">Значение по умолчанию.</param>
+        public BrickParameter(
+            double minValue,
+            double maxValue,
+            double defaultValue)
         {
             _minValue = minValue;
             _maxValue = maxValue;
             _value = defaultValue;
         }
 
-        //TODO: validation
+        /// <summary>
+        /// Получает или задает текущее значение параметра.
+        /// </summary>
         public double Value
         {
             get => _value;
             set => _value = value;
         }
 
-        //TODO: validation
+        /// <summary>
+        /// Получает или задает минимальное допустимое значение параметра.
+        /// </summary>
         public double MinValue
         {
             get => _minValue;
             set => _minValue = value;
         }
-        //TODO: validation
 
+        /// <summary>
+        /// Получает или задает максимальное допустимое значение параметра.
+        /// </summary>
         public double MaxValue
         {
             get => _maxValue;
             set => _maxValue = value;
         }
 
-        public bool IsValid()
-        {
-            return _value >= _minValue && _value <= _maxValue;
-        }
+        /// <summary>
+        /// Получает значение, указывающее, находится ли текущее значение в допустимом диапазоне.
+        /// </summary>
+        /// <returns>
+        /// true, если значение корректно; иначе false.
+        /// </returns>
+        public bool IsValid => _value >= _minValue && _value <= _maxValue;
     }
 }

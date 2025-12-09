@@ -214,9 +214,9 @@ namespace BrickPlugin
             label_UnitRadius.ForeColor = Color.Gray;
             label_UnitRadius.Location = new Point(302, 144);
             label_UnitRadius.Name = "label_UnitRadius";
-            label_UnitRadius.Size = new Size(60, 15);
+            label_UnitRadius.Size = new Size(48, 15);
             label_UnitRadius.TabIndex = 7;
-            label_UnitRadius.Text = "мин. 2мм";
+            label_UnitRadius.Text = "2-30мм";
             // 
             // label_MaxRadiusHint
             // 
@@ -226,9 +226,9 @@ namespace BrickPlugin
             label_MaxRadiusHint.ForeColor = Color.DarkGreen;
             label_MaxRadiusHint.Location = new Point(449, 144);
             label_MaxRadiusHint.Name = "label_MaxRadiusHint";
-            label_MaxRadiusHint.Size = new Size(81, 15);
+            label_MaxRadiusHint.Size = new Size(66, 15);
             label_MaxRadiusHint.TabIndex = 8;
-            label_MaxRadiusHint.Text = "Макс: 30.0 мм";
+            label_MaxRadiusHint.Text = "Макс: 8 мм";
             // 
             // label_RadiusCount
             // 
@@ -263,7 +263,7 @@ namespace BrickPlugin
             label_MaxHolesHint.Name = "label_MaxHolesHint";
             label_MaxHolesHint.Size = new Size(76, 15);
             label_MaxHolesHint.TabIndex = 10;
-            label_MaxHolesHint.Text = "Макс: 42 шт";
+            label_MaxHolesHint.Text = "Макс: 19 шт";
             // 
             // panel1
             // 
@@ -295,6 +295,8 @@ namespace BrickPlugin
             ClientSize = new Size(600, 270);
             Controls.Add(panel1);
             Controls.Add(tableLayoutPanel1);
+            MaximizeBox = false;
+            MinimumSize = new Size(616, 309);
             Name = "MainForm";
             Text = "Плагин \"Кирпич\" КОМПАС-3D";
             tableLayoutPanel1.ResumeLayout(false);

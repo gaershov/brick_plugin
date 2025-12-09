@@ -1,98 +1,122 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using BrickPlugin.Models;
 using Kompas6API5;
+using Kompas6Constants3D;
 
 namespace BrickPlugin.Services
 {
-    //TODO: XML
+    /// <summary>
+    /// Строит 3D-модель кирпича с отверстиями в КОМПАС-3D.
+    /// </summary>
     public class BrickBuilder
     {
-        //TODO: raname
-        private readonly KompasWrapper _k;
+        /// <summary>
+        /// Обертка для работы с API КОМПАС-3D.
+        /// </summary>
+        private readonly KompasWrapper _kompasWrapper;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр класса BrickBuilder.
+        /// </summary>
         public BrickBuilder()
         {
-            _k = new KompasWrapper();
+            _kompasWrapper = new KompasWrapper();
         }
 
-        //TODO: RSDN
-        public void Build(BrickParameters p)
+        /// <summary>
+        /// Строит 3D-модель кирпича с заданными параметрами.
+        /// </summary>
+        /// <param name="parameters">Параметры кирпича.</param>
+        public void Build(BrickParameters parameters)
         {
-            _k.OpenKompas();
-            _k.CreateDocument();
-            BuildBody(p);
-            BuildHoles(p);
+            _kompasWrapper.OpenKompas();
+            _kompasWrapper.CreateDocument();
+            BuildBody(parameters);
+            BuildHoles(parameters);
         }
 
-        private void BuildBody(BrickParameters p)
+        /// <summary>
+        /// Строит тело кирпича (параллелепипед).
+        /// </summary>
+        /// <param name="parameters">Параметры кирпича.</param>
+        private void BuildBody(BrickParameters parameters)
         {
-            //TODO: RSDN
-            double L = p[ParameterType.Length];
-            double W = p[ParameterType.Width];
-            double H = p[ParameterType.Height];
+            double length = parameters[ParameterType.Length];
+            double width = parameters[ParameterType.Width];
+            double height = parameters[ParameterType.Height];
 
-            ksEntity sketch = _k.CreateSketchOnXOY();
-            ksDocument2D d2 = _k.BeginSketch(sketch);
+            ksEntity sketch = _kompasWrapper.CreateSketchOnXOY();
+            ksDocument2D document2D = _kompasWrapper.BeginSketch(sketch);
 
-            double x1 = -L / 2;
-            double y1 = -W / 2;
-            double x2 = L / 2;
-            double y2 = W / 2;
+            double leftX = -length / 2;
+            double bottomY = -width / 2;
+            double rightX = length / 2;
+            double topY = width / 2;
 
-            d2.ksLineSeg(x1, y1, x2, y1, 1);
-            d2.ksLineSeg(x2, y1, x2, y2, 1);
-            d2.ksLineSeg(x2, y2, x1, y2, 1);
-            d2.ksLineSeg(x1, y2, x1, y1, 1);
+            document2D.ksLineSeg(leftX, bottomY, rightX, bottomY, 1);
+            document2D.ksLineSeg(rightX, bottomY, rightX, topY, 1);
+            document2D.ksLineSeg(rightX, topY, leftX, topY, 1);
+            document2D.ksLineSeg(leftX, topY, leftX, bottomY, 1);
 
-            _k.EndSketch(sketch);
-            _k.Extrude(sketch, H);
+            _kompasWrapper.EndSketch(sketch);
+            _kompasWrapper.Extrude(sketch, height);
         }
 
-        private void BuildHoles(BrickParameters p)
+        /// <summary>
+        /// Строит отверстия в кирпиче.
+        /// </summary>
+        /// <param name="parameters">Параметры кирпича.</param>
+        private void BuildHoles(BrickParameters parameters)
         {
-            int count = (int)p[ParameterType.HolesCount];
+            int count = (int)parameters[ParameterType.HolesCount];
             if (count <= 0)
             {
                 return;
             }
 
-            double r = p[ParameterType.HoleRadius];
-            if (r <= 0)
+            double radius = parameters[ParameterType.HoleRadius];
+            if (radius <= 0)
             {
                 return;
             }
 
-            double L = p[ParameterType.Length];
-            double W = p[ParameterType.Width];
+            double length = parameters[ParameterType.Length];
+            double width = parameters[ParameterType.Width];
 
-            ksEntity sketch = _k.CreateSketchOnXOY();
-            ksDocument2D d2 = _k.BeginSketch(sketch);
+            ksEntity sketch = _kompasWrapper.CreateSketchOnXOY();
+            ksDocument2D document2D = _kompasWrapper.BeginSketch(sketch);
 
-            PlaceHoles(d2, count, r, L, W);
+            PlaceHoles(document2D, count, radius, length, width);
 
-            _k.EndSketch(sketch);
-            _k.Cut(sketch);
+            _kompasWrapper.EndSketch(sketch);
+            _kompasWrapper.Cut(sketch);
         }
 
-        //TODO: RSDN
-        private void PlaceHoles(ksDocument2D d2, int count, double radius, double length, double width)
+        /// <summary>
+        /// Размещает отверстия на плоскости эскиза с учетом оптимального распределения.
+        /// </summary>
+        /// <param name="document2D">2D-документ для рисования.</param>
+        /// <param name="count">Количество отверстий.</param>
+        /// <param name="radius">Радиус отверстия.</param>
+        /// <param name="length">Длина кирпича.</param>
+        /// <param name="width">Ширина кирпича.</param>
+        private void PlaceHoles(ksDocument2D document2D, int count, double radius,
+            double length, double width)
         {
-            //TODO: duplication
-            double diameter = 2 * radius;
-            double edgeMargin = Math.Max(2 * radius, 10);
-            double minGap = Math.Max(1.5 * radius, 5);
-
-            double availableLength = length - 2 * edgeMargin;
-            double availableWidth = width - 2 * edgeMargin;
+            var area = BrickParameters.CalculateAvailableArea(length, width, radius);
 
             if (count == 1)
             {
-                d2.ksCircle(0, 0, radius, 1);
+                document2D.ksCircle(0, 0, radius, 1);
                 return;
             }
-            //TODO: RSDN
-            int maxPerRow = (int)Math.Floor((availableLength + minGap) / (diameter + minGap));
-            int maxRows = (int)Math.Floor((availableWidth + minGap) / (diameter + minGap));
+
+            int maxPerRow = (int)Math.Floor(
+                (area.availableLength + area.minGap) / (area.diameter + area.minGap));
+            int maxRows = (int)Math.Floor(
+                (area.availableWidth + area.minGap) / (area.diameter + area.minGap));
 
             if (maxPerRow <= 0 || maxRows <= 0)
             {
@@ -100,61 +124,116 @@ namespace BrickPlugin.Services
             }
 
             int rows = DetermineRowCount(count, maxPerRow, maxRows);
-            var distribution = DistributeHolesAcrossRows(count, rows);
+            List<int> distribution = DistributeHolesAcrossRows(count, rows);
 
             int maxHolesInRow = distribution.Max();
 
-            double gapX = 0;
-            if (maxHolesInRow > 1)
-            {
-                double totalHoleWidth = maxHolesInRow * diameter;
-                double remainingSpace = availableLength - totalHoleWidth;
-                gapX = Math.Max(minGap, remainingSpace / (maxHolesInRow - 1));
-            }
+            double horizontalGap = CalculateHorizontalGap(
+                maxHolesInRow, area.diameter, area.availableLength, area.minGap);
+            double verticalGap = CalculateVerticalGap(
+                rows, area.diameter, area.availableWidth, area.minGap);
 
-            double gapY = 0;
-            if (rows > 1)
-            {
-                double totalHoleHeight = rows * diameter;
-                double remainingSpace = availableWidth - totalHoleHeight;
-                gapY = Math.Max(minGap, remainingSpace / (rows - 1));
-            }
+            double startY = ((rows - 1) * (area.diameter + verticalGap)) / 2.0;
 
-            double startY = ((rows - 1) * (diameter + gapY)) / 2.0;
+            double halfAvailableLength = area.availableLength / 2.0;
+            double halfAvailableWidth = area.availableWidth / 2.0;
 
             for (int row = 0; row < rows; row++)
             {
                 int holesInRow = distribution[row];
-                double y = startY - row * (diameter + gapY);
+                double currentY = startY - row * (area.diameter + verticalGap);
 
-                double rowWidth = (holesInRow - 1) * (diameter + gapX);
+                double rowWidth = (holesInRow - 1) * (area.diameter + horizontalGap);
                 double startX = -rowWidth / 2.0;
 
-                for (int col = 0; col < holesInRow; col++)
+                for (int column = 0; column < holesInRow; column++)
                 {
-                    double x = startX + col * (diameter + gapX);
-                    d2.ksCircle(x, y, radius, 1);
+                    double currentX = startX + column * (area.diameter + horizontalGap);
+
+                    double minX = -halfAvailableLength + radius;
+                    double maxX = halfAvailableLength - radius;
+                    double minY = -halfAvailableWidth + radius;
+                    double maxY = halfAvailableWidth - radius;
+
+                    currentX = Math.Max(minX, Math.Min(maxX, currentX));
+                    currentY = Math.Max(minY, Math.Min(maxY, currentY));
+
+                    document2D.ksCircle(currentX, currentY, radius, 1);
                 }
             }
         }
 
-        //TODO: RSDN
+        /// <summary>
+        /// Рассчитывает горизонтальный зазор между отверстиями в ряду.
+        /// </summary>
+        /// <param name="maxHolesInRow">Максимальное количество отверстий в ряду.</param>
+        /// <param name="diameter">Диаметр отверстия.</param>
+        /// <param name="availableLength">Доступная длина для размещения.</param>
+        /// <param name="minGap">Минимальный зазор.</param>
+        /// <returns>Рассчитанный горизонтальный зазор.</returns>
+        private double CalculateHorizontalGap(int maxHolesInRow, double diameter,
+            double availableLength, double minGap)
+        {
+            if (maxHolesInRow <= 1)
+            {
+                return 0;
+            }
+
+            double totalHoleWidth = maxHolesInRow * diameter;
+            double remainingSpace = availableLength - totalHoleWidth;
+            return Math.Max(minGap, remainingSpace / (maxHolesInRow - 1));
+        }
+
+        /// <summary>
+        /// Рассчитывает вертикальный зазор между рядами отверстий.
+        /// </summary>
+        /// <param name="rows">Количество рядов.</param>
+        /// <param name="diameter">Диаметр отверстия.</param>
+        /// <param name="availableWidth">Доступная ширина для размещения.</param>
+        /// <param name="minGap">Минимальный зазор.</param>
+        /// <returns>Рассчитанный вертикальный зазор.</returns>
+        private double CalculateVerticalGap(int rows, double diameter,
+            double availableWidth, double minGap)
+        {
+            if (rows <= 1)
+            {
+                return 0;
+            }
+
+            double totalHoleHeight = rows * diameter;
+            double remainingSpace = availableWidth - totalHoleHeight;
+            return Math.Max(minGap, remainingSpace / (rows - 1));
+        }
+
+        /// <summary>
+        /// Определяет оптимальное количество рядов для размещения отверстий.
+        /// </summary>
+        /// <param name="totalHoles">Общее количество отверстий.</param>
+        /// <param name="maxPerRow">Максимум отверстий в одном ряду.</param>
+        /// <param name="maxRows">Максимальное количество рядов.</param>
+        /// <returns>Оптимальное количество рядов.</returns>
         private int DetermineRowCount(int totalHoles, int maxPerRow, int maxRows)
         {
-            int minRows = (int)Math.Ceiling((double)totalHoles / maxPerRow);
-            minRows = Math.Max(1, Math.Min(minRows, maxRows));
+            int minimumRows = (int)Math.Ceiling((double)totalHoles / maxPerRow);
+            minimumRows = Math.Max(1, Math.Min(minimumRows, maxRows));
 
-            if (totalHoles % 2 == 1 && minRows == 2 && maxRows >= 3)
+            if (totalHoles % 2 == 1 && minimumRows == 2 && maxRows >= 3)
             {
                 return 3;
             }
 
-            return minRows;
+            return minimumRows;
         }
 
+        /// <summary>
+        /// Распределяет отверстия по рядам с симметричным размещением.
+        /// </summary>
+        /// <param name="totalHoles">Общее количество отверстий.</param>
+        /// <param name="rows">Количество рядов.</param>
+        /// <returns>Список с количеством отверстий в каждом ряду.</returns>
         private List<int> DistributeHolesAcrossRows(int totalHoles, int rows)
         {
-            var result = new List<int>();
+            List<int> result = new List<int>();
             int baseCount = totalHoles / rows;
             int remainder = totalHoles % rows;
 
