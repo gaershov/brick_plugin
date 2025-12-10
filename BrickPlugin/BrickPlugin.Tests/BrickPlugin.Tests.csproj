@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -7,10 +7,10 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <RunSettingsFilePath>C:\Mac\Home\Desktop\brick_plugin\brick_plugin\BrickPlugin\BrickPlugin.Tests\bin\Debug\net8.0-windows\fine-code-coverage\coverage-tool-output\BrickPlugin.Tests-fcc-mscodecoverage-generated.runsettings</RunSettingsFilePath>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="NUnit" Version="3.14.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />

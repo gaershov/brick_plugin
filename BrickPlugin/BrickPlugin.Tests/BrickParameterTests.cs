@@ -1,168 +1,118 @@
-using NUnit.Framework;
+п»їusing NUnit.Framework;
 using BrickPlugin.Models;
 
 namespace BrickPlugin.Tests
 {
-    /// <summary>
-    /// Тесты для класса BrickParameter.
-    /// </summary>
     [TestFixture]
+    [Description("РўРµСЃС‚С‹ РґР»СЏ РєР»Р°СЃСЃР° BrickParameter")]
     public class BrickParameterTests
     {
-        /// <summary>
-        /// Проверяет, что конструктор корректно инициализирует все поля.
-        /// </summary>
         [Test]
+        [Description("РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєРѕСЂСЂРµРєС‚РЅРѕ РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµС‚ РІСЃРµ РїРѕР»СЏ")]
         public void Constructor_ShouldInitializeAllFields()
         {
-            // Arrange & Act
             var parameter = new BrickParameter(10, 100, 50);
 
-            // Assert
             Assert.AreEqual(10, parameter.MinValue);
             Assert.AreEqual(100, parameter.MaxValue);
             Assert.AreEqual(50, parameter.Value);
         }
 
-        /// <summary>
-        /// Проверяет, что Value корректно возвращает установленное значение.
-        /// </summary>
         [Test]
+        [Description("Value РєРѕСЂСЂРµРєС‚РЅРѕ РІРѕР·РІСЂР°С‰Р°РµС‚ СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ")]
         public void Value_Get_ShouldReturnSetValue()
         {
-            // Arrange
             var parameter = new BrickParameter(10, 100, 50);
 
-            // Act
             var value = parameter.Value;
 
-            // Assert
             Assert.AreEqual(50, value);
         }
 
-        /// <summary>
-        /// Проверяет, что Value корректно устанавливает новое значение.
-        /// </summary>
         [Test]
+        [Description("Value РєРѕСЂСЂРµРєС‚РЅРѕ СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ РЅРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ")]
         public void Value_Set_ShouldUpdateValue()
         {
-            // Arrange
             var parameter = new BrickParameter(10, 100, 50);
 
-            // Act
             parameter.Value = 75;
 
-            // Assert
             Assert.AreEqual(75, parameter.Value);
         }
 
-        /// <summary>
-        /// Проверяет, что MinValue корректно устанавливается и возвращается.
-        /// </summary>
         [Test]
+        [Description("MinValue РєРѕСЂСЂРµРєС‚РЅРѕ СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ Рё РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ")]
         public void MinValue_SetAndGet_ShouldWork()
         {
-            // Arrange
             var parameter = new BrickParameter(10, 100, 50);
 
-            // Act
             parameter.MinValue = 20;
 
-            // Assert
             Assert.AreEqual(20, parameter.MinValue);
         }
 
-        /// <summary>
-        /// Проверяет, что MaxValue корректно устанавливается и возвращается.
-        /// </summary>
         [Test]
+        [Description("MaxValue РєРѕСЂСЂРµРєС‚РЅРѕ СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ Рё РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ")]
         public void MaxValue_SetAndGet_ShouldWork()
         {
-            // Arrange
             var parameter = new BrickParameter(10, 100, 50);
 
-            // Act
             parameter.MaxValue = 200;
 
-            // Assert
             Assert.AreEqual(200, parameter.MaxValue);
         }
 
-        /// <summary>
-        /// Проверяет, что IsValid возвращает true для значения в допустимом диапазоне.
-        /// </summary>
         [Test]
+        [Description("IsValid РІРѕР·РІСЂР°С‰Р°РµС‚ true РґР»СЏ Р·РЅР°С‡РµРЅРёСЏ РІ РґРѕРїСѓСЃС‚РёРјРѕРј РґРёР°РїР°Р·РѕРЅРµ")]
         public void IsValid_WhenValueInRange_ShouldReturnTrue()
         {
-            // Arrange
             var parameter = new BrickParameter(10, 100, 50);
 
-            // Act & Assert
             Assert.IsTrue(parameter.IsValid);
         }
 
-        /// <summary>
-        /// Проверяет, что IsValid возвращает false для значения меньше минимального.
-        /// </summary>
         [Test]
+        [Description("IsValid РІРѕР·РІСЂР°С‰Р°РµС‚ false РґР»СЏ Р·РЅР°С‡РµРЅРёСЏ РјРµРЅСЊС€Рµ РјРёРЅРёРјР°Р»СЊРЅРѕРіРѕ")]
         public void IsValid_WhenValueBelowMin_ShouldReturnFalse()
         {
-            // Arrange
             var parameter = new BrickParameter(10, 100, 5);
 
-            // Act & Assert
             Assert.IsFalse(parameter.IsValid);
         }
 
-        /// <summary>
-        /// Проверяет, что IsValid возвращает false для значения больше максимального.
-        /// </summary>
         [Test]
+        [Description("IsValid РІРѕР·РІСЂР°С‰Р°РµС‚ false РґР»СЏ Р·РЅР°С‡РµРЅРёСЏ Р±РѕР»СЊС€Рµ РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ")]
         public void IsValid_WhenValueAboveMax_ShouldReturnFalse()
         {
-            // Arrange
             var parameter = new BrickParameter(10, 100, 150);
 
-            // Act & Assert
             Assert.IsFalse(parameter.IsValid);
         }
 
-        /// <summary>
-        /// Проверяет, что IsValid возвращает true для значения, равного минимальному.
-        /// </summary>
         [Test]
+        [Description("IsValid РІРѕР·РІСЂР°С‰Р°РµС‚ true РґР»СЏ Р·РЅР°С‡РµРЅРёСЏ, СЂР°РІРЅРѕРіРѕ РјРёРЅРёРјР°Р»СЊРЅРѕРјСѓ")]
         public void IsValid_WhenValueEqualsMin_ShouldReturnTrue()
         {
-            // Arrange
             var parameter = new BrickParameter(10, 100, 10);
 
-            // Act & Assert
             Assert.IsTrue(parameter.IsValid);
         }
 
-        /// <summary>
-        /// Проверяет, что IsValid возвращает true для значения, равного максимальному.
-        /// </summary>
         [Test]
+        [Description("IsValid РІРѕР·РІСЂР°С‰Р°РµС‚ true РґР»СЏ Р·РЅР°С‡РµРЅРёСЏ, СЂР°РІРЅРѕРіРѕ РјР°РєСЃРёРјР°Р»СЊРЅРѕРјСѓ")]
         public void IsValid_WhenValueEqualsMax_ShouldReturnTrue()
         {
-            // Arrange
             var parameter = new BrickParameter(10, 100, 100);
 
-            // Act & Assert
             Assert.IsTrue(parameter.IsValid);
         }
 
-        /// <summary>
-        /// Проверяет, что IsValid корректно обновляется при изменении Value.
-        /// </summary>
         [Test]
+        [Description("IsValid РєРѕСЂСЂРµРєС‚РЅРѕ РѕР±РЅРѕРІР»СЏРµС‚СЃСЏ РїСЂРё РёР·РјРµРЅРµРЅРёРё Value")]
         public void IsValid_WhenValueChanges_ShouldUpdateCorrectly()
         {
-            // Arrange
             var parameter = new BrickParameter(10, 100, 50);
 
-            // Act & Assert
             Assert.IsTrue(parameter.IsValid);
 
             parameter.Value = 5;
@@ -175,32 +125,24 @@ namespace BrickPlugin.Tests
             Assert.IsFalse(parameter.IsValid);
         }
 
-        /// <summary>
-        /// Проверяет, что IsValid корректно обновляется при изменении MinValue.
-        /// </summary>
         [Test]
+        [Description("IsValid РєРѕСЂСЂРµРєС‚РЅРѕ РѕР±РЅРѕРІР»СЏРµС‚СЃСЏ РїСЂРё РёР·РјРµРЅРµРЅРёРё MinValue")]
         public void IsValid_WhenMinValueChanges_ShouldUpdateCorrectly()
         {
-            // Arrange
             var parameter = new BrickParameter(10, 100, 15);
 
-            // Act & Assert
             Assert.IsTrue(parameter.IsValid);
 
             parameter.MinValue = 20;
             Assert.IsFalse(parameter.IsValid);
         }
 
-        /// <summary>
-        /// Проверяет, что IsValid корректно обновляется при изменении MaxValue.
-        /// </summary>
         [Test]
+        [Description("IsValid РєРѕСЂСЂРµРєС‚РЅРѕ РѕР±РЅРѕРІР»СЏРµС‚СЃСЏ РїСЂРё РёР·РјРµРЅРµРЅРёРё MaxValue")]
         public void IsValid_WhenMaxValueChanges_ShouldUpdateCorrectly()
         {
-            // Arrange
             var parameter = new BrickParameter(10, 100, 90);
 
-            // Act & Assert
             Assert.IsTrue(parameter.IsValid);
 
             parameter.MaxValue = 50;
