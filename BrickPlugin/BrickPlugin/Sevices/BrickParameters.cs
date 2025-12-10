@@ -9,13 +9,40 @@ namespace BrickPlugin.Services
     /// </summary>
     public class BrickParameters
     {
+        /// <summary>
+        /// Минимальный отступ от края кирпича до отверстия, используемый
+        /// при расчёте максимального допустимого радиуса.
+        /// </summary>
         private const double MinimumEdgeMargin = 15.0;
+
+        /// <summary>
+        /// Множитель радиуса отверстия для вычисления отступа от края.
+        /// </summary>
         private const double EdgeMarginMultiplier = 0.75;
+
+        /// <summary>
+        /// Дополнительное смещение, добавляемое к отступу от края.
+        /// </summary>
         private const double EdgeMarginOffset = 5.0;
+
+        /// <summary>
+        /// Минимально допустимый отступ от края кирпича до отверстия.
+        /// </summary>
         private const double EdgeMarginMinimum = 10.0;
+
+        /// <summary>
+        /// Множитель радиуса отверстия для расчёта минимального зазора между отверстиями.
+        /// </summary>
         private const double MinGapMultiplier = 0.75;
+
+        /// <summary>
+        /// Минимально допустимый зазор между отверстиями.
+        /// </summary>
         private const double MinGapMinimum = 5.0;
 
+        /// <summary>
+        /// Коллекция параметров кирпича, индексируемая по типу параметра.
+        /// </summary>
         private readonly Dictionary<ParameterType, BrickParameter> _parameters;
 
         /// <summary>
