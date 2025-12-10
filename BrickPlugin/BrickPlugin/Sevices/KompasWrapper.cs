@@ -6,7 +6,6 @@ namespace BrickPlugin.Services
     /// <summary>
     /// Обертка для работы с API КОМПАС-3D.
     /// </summary>
-    //TODO: XML +
     public class KompasWrapper
     {
         /// <summary>

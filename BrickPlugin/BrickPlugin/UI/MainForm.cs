@@ -12,8 +12,11 @@ namespace BrickPlugin
     /// </summary>
     public partial class MainForm : Form
     {
+        //TODO: XML
         private BrickBuilder _builder;
+        //TODO: XML
         private BrickParameters _parameters;
+        //TODO: XML
         private Dictionary<ParameterType, TextBox> _textBoxMap;
 
         /// <summary>

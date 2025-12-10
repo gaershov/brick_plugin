@@ -3,7 +3,6 @@
     /// <summary>
     /// Определяет типы параметров кирпича.
     /// </summary>
-    //TODO: XML +
     public enum ParameterType
     {
         /// <summary>

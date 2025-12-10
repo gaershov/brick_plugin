@@ -135,6 +135,7 @@ namespace BrickPlugin.Tests
         }
 
         [Test]
+        //TODO: RSDN
         [Description("Validate возвращает false, если значение параметра выходит за допустимый диапазон")]
         public void Validate_WithValueOutOfRange_ShouldReturnFalse()
         {

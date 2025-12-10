@@ -164,6 +164,7 @@ namespace BrickPlugin.Services
                     string displayName = GetParameterDisplayName(kvp.Key);
                     string minValue = kvp.Value.MinValue.ToString("F0");
                     string maxValue = kvp.Value.MaxValue.ToString("F0");
+                    //TODO: RSDN
                     errorMessages.Add($"• {displayName}: должно быть в диапазоне [{minValue}, {maxValue}]");
                 }
             }
@@ -193,6 +194,7 @@ namespace BrickPlugin.Services
         /// <param name="width">Ширина кирпича.</param>
         /// <param name="holeRadius">Радиус отверстия.</param>
         /// <returns>Кортеж с diameter, edgeMargin, minGap, availableLength, availableWidth.</returns>
+        /// //TODO: RSDN
         public static (double diameter, double edgeMargin, double minGap, double availableLength,
             double availableWidth) CalculateAvailableArea(double length, double width, double holeRadius)
         {
