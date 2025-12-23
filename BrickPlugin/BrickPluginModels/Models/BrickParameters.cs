@@ -227,13 +227,7 @@ namespace BrickPluginModels.Models
             double width = _parameters[ParameterType.Width].Value;
             double holeRadius = _parameters[ParameterType.HoleRadius].Value;
 
-            // Максимальный радиус по геометрии (чтобы отверстие помещалось)
             double geometricMaxRadius = (width - 2 * MinimumEdgeMargin) / 2.0;
-
-            // Максимальный радиус по пустотности (не более 45% при 1 отверстии)
-            // Пустотность = (π × r² × h) / (l × w × h) × 100%
-            // Для 1 отверстия: π × r² / (l × w) ≤ 0.45
-            // r ≤ sqrt(0.45 × l × w / π)
             double voidnessMaxRadius = Math.Sqrt(0.45 * length * width / Math.PI);
 
             // Берём минимум из двух ограничений
@@ -270,7 +264,9 @@ namespace BrickPluginModels.Models
                     string displayName = GetParameterDisplayName(kvp.Key);
                     string minValue = kvp.Value.MinValue.ToString("F0");
                     string maxValue = kvp.Value.MaxValue.ToString("F0");
-                    errorMessages.Add($"• {displayName}: должно быть в диапазоне [{minValue}, {maxValue}]");
+                    //TODO: RSDN +
+                    errorMessages.Add($"• {displayName}: " +
+                        $"должно быть в диапазоне [{minValue}, {maxValue}]");
                 }
             }
 
@@ -284,7 +280,8 @@ namespace BrickPluginModels.Models
 
             if (errorMessages.Count > 0)
             {
-                string message = "Обнаружены ошибки:\n\n" + string.Join("\n", errorMessages);
+                string message = "Обнаружены ошибки:\n\n" 
+                    + string.Join("\n", errorMessages);
                 ErrorMessage?.Invoke(this, message);
                 return false;
             }
@@ -299,8 +296,12 @@ namespace BrickPluginModels.Models
         /// <param name="width">Ширина кирпича.</param>
         /// <param name="holeRadius">Радиус отверстия.</param>
         /// <returns>Кортеж с diameter, edgeMargin, minGap, availableLength, availableWidth.</returns>
-        public static (double diameter, double edgeMargin, double minGap, double availableLength,
-            double availableWidth) CalculateAvailableArea(double length, double width, double holeRadius)
+        /// //TODO: RSDN +
+        public static (double diameter, double edgeMargin, 
+            double minGap, double availableLength,
+            double availableWidth) CalculateAvailableArea(
+            double length, double width, double holeRadius
+            )
         {
             double diameter = 2 * holeRadius;
             double edgeMargin = Math.Max(
@@ -344,7 +345,8 @@ namespace BrickPluginModels.Models
 
                 if (voidness > 45.0)
                 {
-                    errorMessage = $"• Пустотность ({voidness:F2}%) превышает максимально допустимую (45%)";
+                    errorMessage = $"• Пустотность ({voidness:F2}%) " +
+                        $"превышает максимально допустимую (45%)";
                     return false;
                 }
 
@@ -354,7 +356,8 @@ namespace BrickPluginModels.Models
                     string distributionType = _distributionType == HoleDistributionType.Straight
                         ? "прямого"
                         : "шахматного";
-                    errorMessage = $"• Количество отверстий превышает возможное для {distributionType} распределения";
+                    errorMessage = $"• Количество отверстий превышает возможное для " +
+                        $"{distributionType} распределения";
                     return false;
                 }
             }

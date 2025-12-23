@@ -15,16 +15,19 @@ namespace BrickPluginUI
         /// <summary>
         /// Строитель кирпичей.
         /// </summary>
+        //TODO: XML +
         private BrickBuilder _builder;
 
         /// <summary>
         /// Параметры кирпича.
         /// </summary>
+        //TODO: XML +
         private BrickParameters _parameters;
 
         /// <summary>
         /// Словарь соответствия типов параметров и текстовых полей.
         /// </summary>
+        //TODO: XML +
         private Dictionary<ParameterType, TextBox> _textBoxMap;
 
         /// <summary>
@@ -311,7 +314,8 @@ namespace BrickPluginUI
                 CultureInfo.InvariantCulture, out double targetVoidness))
             {
                 MessageBox.Show(
-                    "Введено некорректное значение пустотности.\nИспользуйте числовой формат, например: 25 или 12.5",
+                    "Введено некорректное значение пустотности." +
+                    "\nИспользуйте числовой формат, например: 25 или 12.5",
                     "Ошибка формата",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
@@ -343,7 +347,8 @@ namespace BrickPluginUI
 
                 if (targetVoidness < range.min || targetVoidness > range.max)
                 {
-                    string distributionName = _parameters.DistributionType == HoleDistributionType.Straight
+                    string distributionName = _parameters.DistributionType 
+                        == HoleDistributionType.Straight
                         ? "прямого"
                         : "шахматного";
 
@@ -375,7 +380,8 @@ namespace BrickPluginUI
                 if (calculationResult.Success)
                 {
                     _isUpdatingProgrammatically = true;
-                    textBox_HolesCountValue.Text = calculationResult.HolesCount.ToString(CultureInfo.InvariantCulture);
+                    textBox_HolesCountValue.Text = 
+                        calculationResult.HolesCount.ToString(CultureInfo.InvariantCulture);
                     _parameters[ParameterType.HolesCount] = calculationResult.HolesCount;
                     textBox_VoidnessValue.BackColor = Color.LightGreen;
                     _isUpdatingProgrammatically = false;
@@ -415,15 +421,18 @@ namespace BrickPluginUI
         /// <param name="length">Длина кирпича.</param>
         /// <param name="width">Ширина кирпича.</param>
         /// <param name="height">Высота кирпича.</param>
-        private void CalculateOptimalParameters(double targetVoidness, double length, double width, double height)
+        private void CalculateOptimalParameters(double targetVoidness, 
+            double length, double width, double height)
         {
             var optimalResult = _parameters.CalculateOptimalParameters(targetVoidness);
 
             if (optimalResult.Success)
             {
                 _isUpdatingProgrammatically = true;
-                textBox_HoleRadiusValue.Text = optimalResult.HoleRadius.ToString("F1", CultureInfo.InvariantCulture);
-                textBox_HolesCountValue.Text = optimalResult.HolesCount.ToString(CultureInfo.InvariantCulture);
+                textBox_HoleRadiusValue.Text = 
+                    optimalResult.HoleRadius.ToString("F1", CultureInfo.InvariantCulture);
+                textBox_HolesCountValue.Text = 
+                    optimalResult.HolesCount.ToString(CultureInfo.InvariantCulture);
                 _parameters[ParameterType.HoleRadius] = optimalResult.HoleRadius;
                 _parameters[ParameterType.HolesCount] = optimalResult.HolesCount;
                 textBox_VoidnessValue.BackColor = Color.LightGreen;
@@ -443,7 +452,8 @@ namespace BrickPluginUI
             else
             {
                 MessageBox.Show(
-                    optimalResult.ErrorMessage ?? "Не удалось подобрать параметры для заданной пустотности.",
+                    optimalResult.ErrorMessage ?? 
+                    "Не удалось подобрать параметры для заданной пустотности.",
                     "Ошибка расчёта",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);

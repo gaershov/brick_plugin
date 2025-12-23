@@ -118,7 +118,8 @@ namespace BrickPlugin.Services
                 return;
             }
 
-            HoleDistributionResult distribution = distributionType == HoleDistributionType.Straight
+            HoleDistributionResult distribution 
+                = distributionType == HoleDistributionType.Straight
                 ? _distributionCalculator.CalculateStraightDistribution
                 (holesCount, length, width, holeRadius)
                 : _distributionCalculator.CalculateStaggeredDistribution
@@ -188,11 +189,11 @@ namespace BrickPlugin.Services
             double length,
             double width)
         {
-            var availableArea = 
+            var availableArea =
                 BrickParameters.CalculateAvailableArea(length, width, holeRadius);
-            double holeDiameter = 
+            double holeDiameter =
                 availableArea.diameter;
-            double horizontalStep = 
+            double horizontalStep =
                 holeDiameter + distribution.HorizontalGap;
 
             int minHolesInRow = distribution.Distribution.Min();

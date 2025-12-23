@@ -1,5 +1,5 @@
-﻿using System;
-using BrickPluginModels.Models;
+﻿using BrickPluginModels.Models;
+using System;
 
 namespace BrickPluginModels.Services
 {

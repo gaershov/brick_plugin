@@ -11,6 +11,7 @@ namespace BrickPlugin.Services
         /// <summary>
         /// Объект приложения КОМПАС.
         /// </summary>
+        //TODO: XML +
         private KompasObject _kompas;
 
         /// <summary>
@@ -132,7 +133,7 @@ namespace BrickPlugin.Services
             ksCutExtrusionDefinition def =
                 (ksCutExtrusionDefinition)op.GetDefinition();
             def.SetSketch(sketch);
-            def.SetSideParam(false, (short)End_Type.etThroughAll, 0, 0, true);
+            def.SetSideParam(false,(short)End_Type.etThroughAll, 0, 0, true);
             op.Create();
         }
     }
