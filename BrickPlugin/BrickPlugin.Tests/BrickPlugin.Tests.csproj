@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BrickPlugin\BrickPlugin.csproj" />
+    <ProjectReference Include="..\BrickPluginModels\BrickPluginModels.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -65,4 +65,8 @@
     <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BrickPluginModels\BrickPluginModels.csproj" />
+  </ItemGroup>
+
 </Project>

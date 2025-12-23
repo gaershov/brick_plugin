@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
-using BrickPlugin.Models;
-using BrickPlugin.Services;
+using BrickPluginModels.Models;
 using System;
 
 namespace BrickPlugin.Tests

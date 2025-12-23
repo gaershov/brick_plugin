@@ -1,8 +1,8 @@
 ﻿using BrickPlugin;
-using BrickPlugin.Models;
+using BrickPluginModels.Models;
 using BrickPlugin.Services;
 
-namespace BrickPlugin
+namespace BrickPluginUI
 {
     partial class MainForm
     {
@@ -36,9 +36,19 @@ namespace BrickPlugin
             label_RadiusCount = new Label();
             textBox_HolesCountValue = new TextBox();
             label_MaxHolesHint = new Label();
+            label_Voidness = new Label();
+            textBox_VoidnessValue = new TextBox();
+            label_UnitVoidness = new Label();
+            button_CalculateVoidness = new Button();
+            label_CurrentVoidness = new Label();
+            label_CurrentVoidnessValue = new Label();
+            groupBox_Distribution = new GroupBox();
+            radioButton_Staggered = new RadioButton();
+            radioButton_Straight = new RadioButton();
             panel1 = new Panel();
             button_Build = new Button();
             tableLayoutPanel1.SuspendLayout();
+            groupBox_Distribution.SuspendLayout();
             panel1.SuspendLayout();
             SuspendLayout();
             // 
@@ -65,17 +75,28 @@ namespace BrickPlugin
             tableLayoutPanel1.Controls.Add(label_RadiusCount, 0, 4);
             tableLayoutPanel1.Controls.Add(textBox_HolesCountValue, 1, 4);
             tableLayoutPanel1.Controls.Add(label_MaxHolesHint, 3, 4);
+            tableLayoutPanel1.Controls.Add(label_Voidness, 0, 5);
+            tableLayoutPanel1.Controls.Add(textBox_VoidnessValue, 1, 5);
+            tableLayoutPanel1.Controls.Add(label_UnitVoidness, 2, 5);
+            tableLayoutPanel1.Controls.Add(button_CalculateVoidness, 3, 5);
+            tableLayoutPanel1.Controls.Add(label_CurrentVoidness, 0, 6);
+            tableLayoutPanel1.Controls.Add(label_CurrentVoidnessValue, 1, 6);
+            tableLayoutPanel1.Controls.Add(groupBox_Distribution, 0, 7);
             tableLayoutPanel1.Dock = DockStyle.Top;
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.Padding = new Padding(5);
-            tableLayoutPanel1.RowCount = 5;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            tableLayoutPanel1.Size = new Size(600, 220);
+            tableLayoutPanel1.RowCount = 9;
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 42F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 70F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 10F));
+            tableLayoutPanel1.Size = new Size(600, 416);
             tableLayoutPanel1.TabIndex = 0;
             // 
             // label_Length
@@ -265,11 +286,118 @@ namespace BrickPlugin
             label_MaxHolesHint.TabIndex = 10;
             label_MaxHolesHint.Text = "Макс: 19 шт";
             // 
+            // label_Voidness
+            // 
+            label_Voidness.Anchor = AnchorStyles.Left;
+            label_Voidness.AutoSize = true;
+            label_Voidness.Font = new Font("Segoe UI", 10F);
+            label_Voidness.Location = new Point(8, 217);
+            label_Voidness.Name = "label_Voidness";
+            label_Voidness.Size = new Size(133, 19);
+            label_Voidness.TabIndex = 12;
+            label_Voidness.Text = "Пустотность, %";
+            // 
+            // textBox_VoidnessValue
+            // 
+            textBox_VoidnessValue.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            textBox_VoidnessValue.BackColor = Color.White;
+            textBox_VoidnessValue.BorderStyle = BorderStyle.FixedSingle;
+            textBox_VoidnessValue.Font = new Font("Segoe UI", 10F);
+            textBox_VoidnessValue.Location = new Point(155, 223);
+            textBox_VoidnessValue.Name = "textBox_VoidnessValue";
+            textBox_VoidnessValue.Size = new Size(141, 25);
+            textBox_VoidnessValue.TabIndex = 5;
+            textBox_VoidnessValue.Text = "0";
+            // 
+            // label_UnitVoidness
+            // 
+            label_UnitVoidness.Anchor = AnchorStyles.Left;
+            label_UnitVoidness.AutoSize = true;
+            label_UnitVoidness.Font = new Font("Segoe UI", 9F);
+            label_UnitVoidness.ForeColor = Color.Gray;
+            label_UnitVoidness.Location = new Point(302, 228);
+            label_UnitVoidness.Name = "label_UnitVoidness";
+            label_UnitVoidness.Size = new Size(45, 15);
+            label_UnitVoidness.TabIndex = 13;
+            label_UnitVoidness.Text = "0-45%";
+            // 
+            // button_CalculateVoidness
+            // 
+            button_CalculateVoidness.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            button_CalculateVoidness.BackColor = SystemColors.ButtonHighlight;
+            button_CalculateVoidness.Font = new Font("Segoe UI", 9F);
+            button_CalculateVoidness.Location = new Point(449, 224);
+            button_CalculateVoidness.Name = "button_CalculateVoidness";
+            button_CalculateVoidness.Size = new Size(138, 28);
+            button_CalculateVoidness.TabIndex = 14;
+            button_CalculateVoidness.Text = "Рассчитать";
+            button_CalculateVoidness.UseVisualStyleBackColor = false;
+            // 
+            // label_CurrentVoidness
+            // 
+            label_CurrentVoidness.Anchor = AnchorStyles.Left;
+            label_CurrentVoidness.AutoSize = true;
+            label_CurrentVoidness.Font = new Font("Segoe UI", 10F);
+            label_CurrentVoidness.Location = new Point(8, 259);
+            label_CurrentVoidness.Name = "label_CurrentVoidness";
+            label_CurrentVoidness.Size = new Size(170, 19);
+            label_CurrentVoidness.TabIndex = 15;
+            label_CurrentVoidness.Text = "Текущая пустотность:";
+            // 
+            // label_CurrentVoidnessValue
+            // 
+            label_CurrentVoidnessValue.Anchor = AnchorStyles.Left;
+            label_CurrentVoidnessValue.AutoSize = true;
+            label_CurrentVoidnessValue.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            label_CurrentVoidnessValue.ForeColor = Color.DarkGreen;
+            label_CurrentVoidnessValue.Location = new Point(155, 259);
+            label_CurrentVoidnessValue.Name = "label_CurrentVoidnessValue";
+            label_CurrentVoidnessValue.Size = new Size(45, 19);
+            label_CurrentVoidnessValue.TabIndex = 16;
+            label_CurrentVoidnessValue.Text = "0.0%";
+            // 
+            // groupBox_Distribution
+            // 
+            tableLayoutPanel1.SetColumnSpan(groupBox_Distribution, 4);
+            groupBox_Distribution.Controls.Add(radioButton_Staggered);
+            groupBox_Distribution.Controls.Add(radioButton_Straight);
+            groupBox_Distribution.Dock = DockStyle.Fill;
+            groupBox_Distribution.Font = new Font("Segoe UI", 10F);
+            groupBox_Distribution.Location = new Point(8, 302);
+            groupBox_Distribution.Name = "groupBox_Distribution";
+            groupBox_Distribution.Padding = new Padding(10, 5, 10, 5);
+            groupBox_Distribution.Size = new Size(584, 64);
+            groupBox_Distribution.TabIndex = 17;
+            groupBox_Distribution.TabStop = false;
+            groupBox_Distribution.Text = "Распределение отверстий";
+            // 
+            // radioButton_Staggered
+            // 
+            radioButton_Staggered.AutoSize = true;
+            radioButton_Staggered.Location = new Point(240, 28);
+            radioButton_Staggered.Name = "radioButton_Staggered";
+            radioButton_Staggered.Size = new Size(187, 23);
+            radioButton_Staggered.TabIndex = 6;
+            radioButton_Staggered.Text = "Шахматное (со смещением)";
+            radioButton_Staggered.UseVisualStyleBackColor = true;
+            // 
+            // radioButton_Straight
+            // 
+            radioButton_Straight.AutoSize = true;
+            radioButton_Straight.Checked = true;
+            radioButton_Straight.Location = new Point(13, 28);
+            radioButton_Straight.Name = "radioButton_Straight";
+            radioButton_Straight.Size = new Size(187, 23);
+            radioButton_Straight.TabIndex = 5;
+            radioButton_Straight.TabStop = true;
+            radioButton_Straight.Text = "Прямое (без смещения)";
+            radioButton_Straight.UseVisualStyleBackColor = true;
+            // 
             // panel1
             // 
             panel1.Controls.Add(button_Build);
             panel1.Dock = DockStyle.Fill;
-            panel1.Location = new Point(0, 220);
+            panel1.Location = new Point(0, 416);
             panel1.Name = "panel1";
             panel1.Size = new Size(600, 50);
             panel1.TabIndex = 1;
@@ -283,7 +411,7 @@ namespace BrickPlugin
             button_Build.Location = new Point(450, 12);
             button_Build.Name = "button_Build";
             button_Build.Size = new Size(140, 32);
-            button_Build.TabIndex = 5;
+            button_Build.TabIndex = 7;
             button_Build.Text = "Построить кирпич";
             button_Build.UseVisualStyleBackColor = false;
             button_Build.Click += button_Build_Click;
@@ -292,15 +420,17 @@ namespace BrickPlugin
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(600, 270);
+            ClientSize = new Size(600, 466);
             Controls.Add(panel1);
             Controls.Add(tableLayoutPanel1);
             MaximizeBox = false;
-            MinimumSize = new Size(616, 309);
+            MinimumSize = new Size(616, 505);
             Name = "MainForm";
             Text = "Плагин \"Кирпич\" КОМПАС-3D";
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
+            groupBox_Distribution.ResumeLayout(false);
+            groupBox_Distribution.PerformLayout();
             panel1.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -322,7 +452,16 @@ namespace BrickPlugin
         private System.Windows.Forms.TextBox textBox_HeightValue;
         private System.Windows.Forms.TextBox textBox_HoleRadiusValue;
         private System.Windows.Forms.TextBox textBox_HolesCountValue;
+        private System.Windows.Forms.GroupBox groupBox_Distribution;
+        private System.Windows.Forms.RadioButton radioButton_Staggered;
+        private System.Windows.Forms.RadioButton radioButton_Straight;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button button_Build;
+        private System.Windows.Forms.Label label_Voidness;
+        private System.Windows.Forms.TextBox textBox_VoidnessValue;
+        private System.Windows.Forms.Label label_UnitVoidness;
+        private System.Windows.Forms.Button button_CalculateVoidness;
+        private System.Windows.Forms.Label label_CurrentVoidness;
+        private System.Windows.Forms.Label label_CurrentVoidnessValue;
     }
 }

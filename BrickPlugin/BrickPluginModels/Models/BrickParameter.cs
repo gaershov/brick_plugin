@@ -1,4 +1,4 @@
-﻿namespace BrickPlugin.Models
+﻿namespace BrickPluginModels.Models
 {
     /// <summary>
     /// Представляет параметр кирпича с ограничениями по минимальному и максимальному значению.

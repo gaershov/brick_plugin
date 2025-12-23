@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using BrickPlugin.Models;
+﻿using BrickPluginModels.Models;
+using BrickPluginModels.Services;
 using Kompas6API5;
-using Kompas6Constants3D;
 
 namespace BrickPlugin.Services
 {
@@ -17,31 +14,34 @@ namespace BrickPlugin.Services
         /// </summary>
         private readonly KompasWrapper _kompasWrapper;
 
+        private readonly HoleDistributionCalculator _distributionCalculator;
+
         /// <summary>
-        /// Инициализирует новый экземпляр класса BrickBuilder.
+        /// Инициализирует новый экземпляр класса <see cref="BrickBuilder"/>.
         /// </summary>
         public BrickBuilder()
         {
             _kompasWrapper = new KompasWrapper();
+            _distributionCalculator = new HoleDistributionCalculator();
         }
 
         /// <summary>
         /// Строит 3D-модель кирпича с заданными параметрами.
         /// </summary>
-        /// <param name="parameters">Параметры кирпича.</param>
+        /// <param name="parameters">Параметры кирпича (размеры, количество и радиус отверстий).</param>
         public void Build(BrickParameters parameters)
         {
             _kompasWrapper.OpenKompas();
             _kompasWrapper.CreateDocument();
-            BuildBody(parameters);
+            BuildBrickBody(parameters);
             BuildHoles(parameters);
         }
 
         /// <summary>
-        /// Строит тело кирпича (параллелепипед).
+        /// Строит основное тело кирпича в виде параллелепипеда.
         /// </summary>
         /// <param name="parameters">Параметры кирпича.</param>
-        private void BuildBody(BrickParameters parameters)
+        private void BuildBrickBody(BrickParameters parameters)
         {
             double length = parameters[ParameterType.Length];
             double width = parameters[ParameterType.Width];
@@ -65,217 +65,182 @@ namespace BrickPlugin.Services
         }
 
         /// <summary>
-        /// Строит отверстия в кирпиче.
+        /// Создает отверстия в кирпиче согласно заданным параметрам.
         /// </summary>
         /// <param name="parameters">Параметры кирпича.</param>
         private void BuildHoles(BrickParameters parameters)
         {
-            int count = (int)parameters[ParameterType.HolesCount];
-            if (count <= 0)
+            int holesCount = (int)parameters[ParameterType.HolesCount];
+            if (holesCount <= 0)
             {
                 return;
             }
 
-            double radius = parameters[ParameterType.HoleRadius];
-            if (radius <= 0)
+            double holeRadius = parameters[ParameterType.HoleRadius];
+            if (holeRadius <= 0)
             {
                 return;
             }
 
             double length = parameters[ParameterType.Length];
             double width = parameters[ParameterType.Width];
+            HoleDistributionType distributionType = parameters.DistributionType;
 
             ksEntity sketch = _kompasWrapper.CreateSketchOnXOY();
             ksDocument2D document2D = _kompasWrapper.BeginSketch(sketch);
 
-            PlaceHoles(document2D, count, radius, length, width);
+            PlaceHoles(document2D, holesCount, holeRadius, length, width, distributionType);
 
             _kompasWrapper.EndSketch(sketch);
             _kompasWrapper.Cut(sketch);
         }
 
         /// <summary>
-        /// Размещает отверстия на плоскости эскиза с учетом оптимального распределения.
+        /// Размещает отверстия на плоскости эскиза согласно выбранному типу распределения.
         /// </summary>
-        /// <param name="document2D">2D-документ для рисования.</param>
-        /// <param name="count">Количество отверстий.</param>
-        /// <param name="radius">Радиус отверстия.</param>
+        /// <param name="document2D">2D-документ для рисования окружностей.</param>
+        /// <param name="holesCount">Количество отверстий.</param>
+        /// <param name="holeRadius">Радиус отверстия.</param>
         /// <param name="length">Длина кирпича.</param>
         /// <param name="width">Ширина кирпича.</param>
-        private void PlaceHoles(ksDocument2D document2D, int count, double radius,
-            double length, double width)
+        /// <param name="distributionType">Тип распределения отверстий.</param>
+        private void PlaceHoles(
+            ksDocument2D document2D,
+            int holesCount,
+            double holeRadius,
+            double length,
+            double width,
+            HoleDistributionType distributionType)
         {
-            var area = BrickParameters.CalculateAvailableArea(length, width, radius);
-
-            if (count == 1)
+            if (holesCount == 1)
             {
-                document2D.ksCircle(0, 0, radius, 1);
+                document2D.ksCircle(0, 0, holeRadius, 1);
                 return;
             }
 
-            int maxPerRow = (int)Math.Floor(
-                (area.availableLength + area.minGap) / (area.diameter + area.minGap));
-            int maxRows = (int)Math.Floor(
-                (area.availableWidth + area.minGap) / (area.diameter + area.minGap));
+            HoleDistributionResult distribution = distributionType == HoleDistributionType.Straight
+                ? _distributionCalculator.CalculateStraightDistribution
+                (holesCount, length, width, holeRadius)
+                : _distributionCalculator.CalculateStaggeredDistribution
+                (holesCount, length, width, holeRadius);
 
-            if (maxPerRow <= 0 || maxRows <= 0)
+            if (distributionType == HoleDistributionType.Straight)
             {
-                return;
+                PlaceHolesStraight(document2D, distribution, holeRadius, length, width);
             }
-
-            int rows = DetermineRowCount(count, maxPerRow, maxRows);
-            List<int> distribution = DistributeHolesAcrossRows(count, rows);
-
-            int maxHolesInRow = distribution.Max();
-
-            double horizontalGap = CalculateHorizontalGap(
-                maxHolesInRow, area.diameter, area.availableLength, area.minGap);
-            double verticalGap = CalculateVerticalGap(
-                rows, area.diameter, area.availableWidth, area.minGap);
-
-            double startY = ((rows - 1) * (area.diameter + verticalGap)) / 2.0;
-
-            double halfAvailableLength = area.availableLength / 2.0;
-            double halfAvailableWidth = area.availableWidth / 2.0;
-
-            for (int row = 0; row < rows; row++)
+            else
             {
-                int holesInRow = distribution[row];
-                double currentY = startY - row * (area.diameter + verticalGap);
+                PlaceHolesStaggered(document2D, distribution, holeRadius, length, width);
+            }
+        }
 
-                double rowWidth = (holesInRow - 1) * (area.diameter + horizontalGap);
+        /// <summary>
+        /// Размещает отверстия прямым способом без смещения между рядами.
+        /// </summary>
+        /// <param name="document2D">2D-документ для рисования окружностей.</param>
+        /// <param name="distribution">Результат расчета распределения отверстий.</param>
+        /// <param name="holeRadius">Радиус отверстия.</param>
+        /// <param name="length">Длина кирпича.</param>
+        /// <param name="width">Ширина кирпича.</param>
+        private void PlaceHolesStraight(
+            ksDocument2D document2D,
+            HoleDistributionResult distribution,
+            double holeRadius,
+            double length,
+            double width)
+        {
+            var availableArea = BrickParameters.CalculateAvailableArea(length, width, holeRadius);
+            double holeDiameter = availableArea.diameter;
+            double horizontalStep = holeDiameter + distribution.HorizontalGap;
+            double verticalStep = holeDiameter + distribution.VerticalGap;
+
+            double totalHeight = (distribution.Rows - 1) * verticalStep;
+            double startY = totalHeight / 2.0;
+
+            for (int row = 0; row < distribution.Rows; row++)
+            {
+                int holesInCurrentRow = distribution.Distribution[row];
+                double yPosition = startY - row * verticalStep;
+
+                double rowWidth = (holesInCurrentRow - 1) * horizontalStep;
                 double startX = -rowWidth / 2.0;
 
-                for (int column = 0; column < holesInRow; column++)
+                for (int column = 0; column < holesInCurrentRow; column++)
                 {
-                    double currentX = startX + column * (area.diameter + horizontalGap);
-
-                    double minX = -halfAvailableLength + radius;
-                    double maxX = halfAvailableLength - radius;
-                    double minY = -halfAvailableWidth + radius;
-                    double maxY = halfAvailableWidth - radius;
-
-                    currentX = Math.Max(minX, Math.Min(maxX, currentX));
-                    currentY = Math.Max(minY, Math.Min(maxY, currentY));
-
-                    document2D.ksCircle(currentX, currentY, radius, 1);
+                    double xPosition = startX + column * horizontalStep;
+                    document2D.ksCircle(xPosition, yPosition, holeRadius, 1);
                 }
             }
         }
 
         /// <summary>
-        /// Рассчитывает горизонтальный зазор между отверстиями в ряду.
+        /// Размещает отверстия шахматным способом со смещением чередующихся рядов.
         /// </summary>
-        /// <param name="maxHolesInRow">Максимальное количество отверстий в ряду.</param>
-        /// <param name="diameter">Диаметр отверстия.</param>
-        /// <param name="availableLength">Доступная длина для размещения.</param>
-        /// <param name="minGap">Минимальный зазор.</param>
-        /// <returns>Рассчитанный горизонтальный зазор.</returns>
-        private double CalculateHorizontalGap(int maxHolesInRow, double diameter,
-            double availableLength, double minGap)
+        /// <param name="document2D">2D-документ для рисования окружностей.</param>
+        /// <param name="distribution">Результат расчета распределения отверстий.</param>
+        /// <param name="holeRadius">Радиус отверстия.</param>
+        /// <param name="length">Длина кирпича.</param>
+        /// <param name="width">Ширина кирпича.</param>
+        private void PlaceHolesStaggered(
+            ksDocument2D document2D,
+            HoleDistributionResult distribution,
+            double holeRadius,
+            double length,
+            double width)
         {
-            if (maxHolesInRow <= 1)
+            var availableArea = 
+                BrickParameters.CalculateAvailableArea(length, width, holeRadius);
+            double holeDiameter = 
+                availableArea.diameter;
+            double horizontalStep = 
+                holeDiameter + distribution.HorizontalGap;
+
+            int minHolesInRow = distribution.Distribution.Min();
+            int maxHolesInRow = distribution.Distribution.Max();
+
+            bool[] shouldOffsetRow = CreateOffsetPattern(distribution.Rows);
+
+            double totalHeight = (distribution.Rows - 1) * distribution.VerticalGap;
+            double startY = totalHeight / 2.0;
+
+            double baseRowWidth = (minHolesInRow - 1) * horizontalStep;
+            double baseStartX = -baseRowWidth / 2.0;
+
+            for (int row = 0; row < distribution.Rows; row++)
             {
-                return 0;
-            }
+                int holesInCurrentRow = distribution.Distribution[row];
+                double yPosition = startY - row * distribution.VerticalGap;
 
-            double totalHoleWidth = maxHolesInRow * diameter;
-            double remainingSpace = availableLength - totalHoleWidth;
-            return Math.Max(minGap, remainingSpace / (maxHolesInRow - 1));
-        }
+                double xStartPosition = baseStartX;
 
-        /// <summary>
-        /// Рассчитывает вертикальный зазор между рядами отверстий.
-        /// </summary>
-        /// <param name="rows">Количество рядов.</param>
-        /// <param name="diameter">Диаметр отверстия.</param>
-        /// <param name="availableWidth">Доступная ширина для размещения.</param>
-        /// <param name="minGap">Минимальный зазор.</param>
-        /// <returns>Рассчитанный вертикальный зазор.</returns>
-        private double CalculateVerticalGap(int rows, double diameter,
-            double availableWidth, double minGap)
-        {
-            if (rows <= 1)
-            {
-                return 0;
-            }
-
-            double totalHoleHeight = rows * diameter;
-            double remainingSpace = availableWidth - totalHoleHeight;
-            return Math.Max(minGap, remainingSpace / (rows - 1));
-        }
-
-        /// <summary>
-        /// Определяет оптимальное количество рядов для размещения отверстий.
-        /// </summary>
-        /// <param name="totalHoles">Общее количество отверстий.</param>
-        /// <param name="maxPerRow">Максимум отверстий в одном ряду.</param>
-        /// <param name="maxRows">Максимальное количество рядов.</param>
-        /// <returns>Оптимальное количество рядов.</returns>
-        private int DetermineRowCount(int totalHoles, int maxPerRow, int maxRows)
-        {
-            int minimumRows = (int)Math.Ceiling((double)totalHoles / maxPerRow);
-            minimumRows = Math.Max(1, Math.Min(minimumRows, maxRows));
-
-            if (totalHoles % 2 == 1 && minimumRows == 2 && maxRows >= 3)
-            {
-                return 3;
-            }
-
-            return minimumRows;
-        }
-
-        /// <summary>
-        /// Распределяет отверстия по рядам с симметричным размещением.
-        /// </summary>
-        /// <param name="totalHoles">Общее количество отверстий.</param>
-        /// <param name="rows">Количество рядов.</param>
-        /// <returns>Список с количеством отверстий в каждом ряду.</returns>
-        private List<int> DistributeHolesAcrossRows(int totalHoles, int rows)
-        {
-            List<int> result = new List<int>();
-            int baseCount = totalHoles / rows;
-            int remainder = totalHoles % rows;
-
-            for (int i = 0; i < rows; i++)
-            {
-                result.Add(baseCount);
-            }
-
-            if (remainder == 0)
-            {
-                return result;
-            }
-
-            if (remainder % 2 == 1)
-            {
-                int center = rows / 2;
-                result[center]++;
-                remainder--;
-            }
-
-            int left = 0;
-            int right = rows - 1;
-
-            while (remainder > 0)
-            {
-                if (left <= right && remainder > 0)
+                if (shouldOffsetRow[row])
                 {
-                    result[left]++;
-                    remainder--;
+                    xStartPosition -= distribution.StaggerOffset;
                 }
 
-                if (right > left && remainder > 0)
+                for (int column = 0; column < holesInCurrentRow; column++)
                 {
-                    result[right]++;
-                    remainder--;
+                    double xPosition = xStartPosition + column * horizontalStep;
+                    document2D.ksCircle(xPosition, yPosition, holeRadius, 1);
                 }
+            }
+        }
 
-                left++;
-                right--;
+        /// <summary>
+        /// Создает шаблон смещения для рядов (нечетные ряды смещаются).
+        /// </summary>
+        /// <param name="rowsCount">Количество рядов.</param>
+        /// <returns>Массив флагов, указывающих, нужно ли смещать каждый ряд.</returns>
+        private bool[] CreateOffsetPattern(int rowsCount)
+        {
+            var offsetPattern = new bool[rowsCount];
+
+            for (int i = 0; i < rowsCount; i++)
+            {
+                offsetPattern[i] = (i % 2 == 1);
             }
 
-            return result;
+            return offsetPattern;
         }
     }
 }

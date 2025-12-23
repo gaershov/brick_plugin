@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using BrickPlugin.Models;
+﻿using BrickPluginModels.Services;
 
-namespace BrickPlugin.Services
+namespace BrickPluginModels.Models
 {
     /// <summary>
     /// Управляет параметрами кирпича и их валидацией.
@@ -46,6 +44,21 @@ namespace BrickPlugin.Services
         private readonly Dictionary<ParameterType, BrickParameter> _parameters;
 
         /// <summary>
+        /// Калькулятор распределения отверстий.
+        /// </summary>
+        private readonly HoleDistributionCalculator _distributionCalculator;
+
+        /// <summary>
+        /// Калькулятор пустотности кирпича.
+        /// </summary>
+        private readonly VoidnessCalculator _voidnessCalculator;
+
+        /// <summary>
+        /// Текущий тип распределения отверстий.
+        /// </summary>
+        private HoleDistributionType _distributionType;
+
+        /// <summary>
         /// Событие, возникающее при появлении ошибки валидации.
         /// </summary>
         public event EventHandler<string> ErrorMessage;
@@ -74,6 +87,10 @@ namespace BrickPlugin.Services
                 { ParameterType.HolesCount, new BrickParameter(0, 5777, 19) }
             };
 
+            _distributionCalculator = new HoleDistributionCalculator();
+            _voidnessCalculator = new VoidnessCalculator();
+            _distributionType = HoleDistributionType.Straight;
+
             CalculateDependent();
         }
 
@@ -88,6 +105,19 @@ namespace BrickPlugin.Services
             set
             {
                 _parameters[name].Value = value;
+                CalculateDependent();
+            }
+        }
+
+        /// <summary>
+        /// Получает или задает тип распределения отверстий.
+        /// </summary>
+        public HoleDistributionType DistributionType
+        {
+            get => _distributionType;
+            set
+            {
+                _distributionType = value;
                 CalculateDependent();
             }
         }
@@ -119,7 +149,73 @@ namespace BrickPlugin.Services
         public string GetMaxHolesHint()
         {
             double maximumHoles = _parameters[ParameterType.HolesCount].MaxValue;
-            return $"Макс: {(int)maximumHoles} шт";
+            string distributionInfo = _distributionType == HoleDistributionType.Straight
+                ? "прямое"
+                : "шахматное";
+            return $"Макс: {(int)maximumHoles} шт ({distributionInfo})";
+        }
+
+        /// <summary>
+        /// Рассчитывает текущую пустотность кирпича в процентах.
+        /// </summary>
+        /// <returns>Пустотность в процентах.</returns>
+        public double CalculateCurrentVoidness()
+        {
+            double length = _parameters[ParameterType.Length].Value;
+            double width = _parameters[ParameterType.Width].Value;
+            double height = _parameters[ParameterType.Height].Value;
+            double holeRadius = _parameters[ParameterType.HoleRadius].Value;
+            int holesCount = (int)_parameters[ParameterType.HolesCount].Value;
+
+            return _voidnessCalculator.CalculateCurrentVoidness(
+                length, width, height, holeRadius, holesCount);
+        }
+
+        /// <summary>
+        /// Рассчитывает оптимальные параметры отверстий для достижения заданной пустотности.
+        /// </summary>
+        /// <param name="targetVoidness">Желаемая пустотность в процентах.</param>
+        /// <returns>Результат расчёта с оптимальными параметрами.</returns>
+        public VoidnessCalculationResult CalculateOptimalParameters(double targetVoidness)
+        {
+            double length = _parameters[ParameterType.Length].Value;
+            double width = _parameters[ParameterType.Width].Value;
+            double height = _parameters[ParameterType.Height].Value;
+
+            return _voidnessCalculator.CalculateOptimalParameters(
+                length, width, height, targetVoidness, _distributionType);
+        }
+
+        /// <summary>
+        /// Рассчитывает количество отверстий для достижения заданной пустотности
+        /// при фиксированном радиусе.
+        /// </summary>
+        /// <param name="targetVoidness">Желаемая пустотность в процентах.</param>
+        /// <returns>Результат расчёта с количеством отверстий.</returns>
+        public VoidnessCalculationResult CalculateHolesCountForVoidness(double targetVoidness)
+        {
+            double length = _parameters[ParameterType.Length].Value;
+            double width = _parameters[ParameterType.Width].Value;
+            double height = _parameters[ParameterType.Height].Value;
+            double holeRadius = _parameters[ParameterType.HoleRadius].Value;
+
+            return _voidnessCalculator.CalculateHolesCountForVoidness(
+                length, width, height, holeRadius, targetVoidness, _distributionType);
+        }
+
+        /// <summary>
+        /// Получает доступный диапазон пустотности для текущих параметров кирпича.
+        /// </summary>
+        /// <returns>Кортеж с минимальной и максимальной пустотностью.</returns>
+        public (double min, double max) GetVoidnessRange()
+        {
+            double length = _parameters[ParameterType.Length].Value;
+            double width = _parameters[ParameterType.Width].Value;
+            double height = _parameters[ParameterType.Height].Value;
+            double holeRadius = _parameters[ParameterType.HoleRadius].Value;
+
+            return _voidnessCalculator.GetVoidnessRange(
+                length, width, height, holeRadius, _distributionType);
         }
 
         /// <summary>
@@ -131,7 +227,17 @@ namespace BrickPlugin.Services
             double width = _parameters[ParameterType.Width].Value;
             double holeRadius = _parameters[ParameterType.HoleRadius].Value;
 
-            double maximumRadius = (width - 2 * MinimumEdgeMargin) / 2.0;
+            // Максимальный радиус по геометрии (чтобы отверстие помещалось)
+            double geometricMaxRadius = (width - 2 * MinimumEdgeMargin) / 2.0;
+
+            // Максимальный радиус по пустотности (не более 45% при 1 отверстии)
+            // Пустотность = (π × r² × h) / (l × w × h) × 100%
+            // Для 1 отверстия: π × r² / (l × w) ≤ 0.45
+            // r ≤ sqrt(0.45 × l × w / π)
+            double voidnessMaxRadius = Math.Sqrt(0.45 * length * width / Math.PI);
+
+            // Берём минимум из двух ограничений
+            double maximumRadius = Math.Min(geometricMaxRadius, voidnessMaxRadius);
             _parameters[ParameterType.HoleRadius].MaxValue = Math.Max(2, maximumRadius);
 
             MaxRadiusChanged?.Invoke(this, GetMaxRadiusHint());
@@ -164,7 +270,6 @@ namespace BrickPlugin.Services
                     string displayName = GetParameterDisplayName(kvp.Key);
                     string minValue = kvp.Value.MinValue.ToString("F0");
                     string maxValue = kvp.Value.MaxValue.ToString("F0");
-                    //TODO: RSDN
                     errorMessages.Add($"• {displayName}: должно быть в диапазоне [{minValue}, {maxValue}]");
                 }
             }
@@ -194,7 +299,6 @@ namespace BrickPlugin.Services
         /// <param name="width">Ширина кирпича.</param>
         /// <param name="holeRadius">Радиус отверстия.</param>
         /// <returns>Кортеж с diameter, edgeMargin, minGap, availableLength, availableWidth.</returns>
-        /// //TODO: RSDN
         public static (double diameter, double edgeMargin, double minGap, double availableLength,
             double availableWidth) CalculateAvailableArea(double length, double width, double holeRadius)
         {
@@ -219,6 +323,7 @@ namespace BrickPlugin.Services
             errorMessage = null;
             double width = _parameters[ParameterType.Width].Value;
             double length = _parameters[ParameterType.Length].Value;
+            double height = _parameters[ParameterType.Height].Value;
             double holeRadius = _parameters[ParameterType.HoleRadius].Value;
             int holesCount = (int)_parameters[ParameterType.HolesCount].Value;
 
@@ -231,10 +336,25 @@ namespace BrickPlugin.Services
 
             if (holesCount > 0 && holeRadius >= 2)
             {
+                // Проверка пустотности (не более 45%)
+                double brickVolume = length * width * height;
+                double holeVolume = Math.PI * holeRadius * holeRadius * height;
+                double totalHolesVolume = holeVolume * holesCount;
+                double voidness = (totalHolesVolume / brickVolume) * 100.0;
+
+                if (voidness > 45.0)
+                {
+                    errorMessage = $"• Пустотность ({voidness:F2}%) превышает максимально допустимую (45%)";
+                    return false;
+                }
+
                 double maximumHoles = CalculateMaxHoles(length, width, holeRadius);
                 if (holesCount > maximumHoles)
                 {
-                    errorMessage = "• Количество отверстий превышает возможное";
+                    string distributionType = _distributionType == HoleDistributionType.Straight
+                        ? "прямого"
+                        : "шахматного";
+                    errorMessage = $"• Количество отверстий превышает возможное для {distributionType} распределения";
                     return false;
                 }
             }
@@ -251,31 +371,9 @@ namespace BrickPlugin.Services
         /// <returns>Максимальное количество отверстий.</returns>
         private double CalculateMaxHoles(double length, double width, double holeRadius)
         {
-            var area = CalculateAvailableArea(length, width, holeRadius);
-
-            if (area.availableLength < 0 || area.availableWidth < 0)
-            {
-                return 0;
-            }
-
-            if (area.availableLength < area.diameter || area.availableWidth < area.diameter)
-            {
-                if (length >= area.diameter && width >= area.diameter)
-                {
-                    return 1;
-                }
-                return 0;
-            }
-
-            int maxHorizontal = (int)Math.Floor(
-                (area.availableLength + area.minGap) / (area.diameter + area.minGap));
-            int maxVertical = (int)Math.Floor(
-                (area.availableWidth + area.minGap) / (area.diameter + area.minGap));
-
-            maxHorizontal = Math.Max(1, maxHorizontal);
-            maxVertical = Math.Max(1, maxVertical);
-
-            return maxHorizontal * maxVertical;
+            return _distributionType == HoleDistributionType.Straight
+                ? _distributionCalculator.CalculateMaxHolesStraight(length, width, holeRadius)
+                : _distributionCalculator.CalculateMaxHolesStaggered(length, width, holeRadius);
         }
 
         /// <summary>
