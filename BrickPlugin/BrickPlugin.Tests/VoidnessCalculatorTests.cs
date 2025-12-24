@@ -12,6 +12,7 @@ namespace BrickPlugin.Tests
         private VoidnessCalculator _calculator;
 
         [SetUp]
+        //TODO: refactor
         public void Setup()
         {
             _calculator = new VoidnessCalculator();
@@ -21,6 +22,7 @@ namespace BrickPlugin.Tests
         [Description("CalculateCurrentVoidness возвращает 0 для нуля отверстий")]
         public void CalculateCurrentVoidness_ZeroHoles_ShouldReturnZero()
         {
+            //TODO: RSDN
             var voidness = _calculator.CalculateCurrentVoidness(250, 120, 65, 8, 0);
 
             Assert.AreEqual(0, voidness, 0.01);
@@ -30,6 +32,7 @@ namespace BrickPlugin.Tests
         [Description("CalculateCurrentVoidness возвращает положительное значение")]
         public void CalculateCurrentVoidness_WithHoles_ShouldReturnPositiveValue()
         {
+            //TODO: RSDN
             var voidness = _calculator.CalculateCurrentVoidness(250, 120, 65, 8, 10);
 
             Assert.IsTrue(voidness > 0);
@@ -39,6 +42,7 @@ namespace BrickPlugin.Tests
         [Description("CalculateCurrentVoidness увеличивается с количеством")]
         public void CalculateCurrentVoidness_MoreHoles_HigherVoidness()
         {
+            //TODO: RSDN
             var voidness1 = _calculator.CalculateCurrentVoidness(250, 120, 65, 8, 5);
             var voidness2 = _calculator.CalculateCurrentVoidness(250, 120, 65, 8, 10);
 
@@ -49,6 +53,7 @@ namespace BrickPlugin.Tests
         [Description("CalculateCurrentVoidness увеличивается с радиусом")]
         public void CalculateCurrentVoidness_LargerRadius_HigherVoidness()
         {
+            //TODO: RSDN
             var voidness1 = _calculator.CalculateCurrentVoidness(250, 120, 65, 5, 10);
             var voidness2 = _calculator.CalculateCurrentVoidness(250, 120, 65, 10, 10);
 
@@ -59,6 +64,7 @@ namespace BrickPlugin.Tests
         [Description("CalculateCurrentVoidness уменьшается с размером кирпича")]
         public void CalculateCurrentVoidness_LargerBrick_LowerVoidness()
         {
+            //TODO: RSDN
             var voidness1 = _calculator.CalculateCurrentVoidness(250, 120, 65, 8, 10);
             var voidness2 = _calculator.CalculateCurrentVoidness(500, 240, 130, 8, 10);
 
@@ -110,6 +116,7 @@ namespace BrickPlugin.Tests
         [Description("CalculateMinPossibleVoidness равно пустотности для 1 отверстия")]
         public void CalculateMinPossibleVoidness_ShouldEqualOneHole()
         {
+            //TODO: RSDN
             var minVoidness = _calculator.CalculateMinPossibleVoidness(250, 120, 65, 8);
             var actual = _calculator.CalculateCurrentVoidness(250, 120, 65, 8, 1);
 
@@ -141,6 +148,7 @@ namespace BrickPlugin.Tests
         }
 
         [Test]
+        //TODO: RSDN
         [Description("CalculateOptimalParameters возвращает ошибку для пустотности больше 45")]
         public void CalculateOptimalParameters_Above45_ShouldReturnError()
         {
@@ -197,6 +205,7 @@ namespace BrickPlugin.Tests
         }
 
         [Test]
+        //TODO: RSDN
         [Description("CalculateHolesCountForVoidness возвращает ошибку для пустотности больше 45")]
         public void CalculateHolesCountForVoidness_Above45_ShouldReturnError()
         {

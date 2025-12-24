@@ -14,6 +14,7 @@ namespace BrickPlugin.Services
         /// </summary>
         private readonly KompasWrapper _kompasWrapper;
 
+        //TODO: XML
         private readonly HoleDistributionCalculator _distributionCalculator;
 
         /// <summary>
@@ -151,6 +152,7 @@ namespace BrickPlugin.Services
             double length,
             double width)
         {
+            //TODO: RSDN
             var availableArea = BrickParameters.CalculateAvailableArea(length, width, holeRadius);
             double holeDiameter = availableArea.diameter;
             double horizontalStep = holeDiameter + distribution.HorizontalGap;

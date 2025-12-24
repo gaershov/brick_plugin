@@ -11,7 +11,6 @@ namespace BrickPlugin.Services
         /// <summary>
         /// Объект приложения КОМПАС.
         /// </summary>
-        //TODO: XML +
         private KompasObject _kompas;
 
         /// <summary>
@@ -48,6 +47,7 @@ namespace BrickPlugin.Services
             _kompas.Visible = true;
             _kompas.ActivateControllerAPI();
 
+            //TODO: костыли?
             Thread.Sleep(800);
         }
 

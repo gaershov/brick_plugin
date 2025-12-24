@@ -17,8 +17,10 @@ namespace BrickPluginModels.Services
         /// <param name="width">Ширина кирпича в миллиметрах.</param>
         /// <param name="holeRadius">Радиус отверстия в миллиметрах.</param>
         /// <returns>Максимальное количество отверстий.</returns>
+        /// //TODO: RSDN
         public int CalculateMaxHolesStraight(double length, double width, double holeRadius)
         {
+            //TODO: RSDN
             var availableArea = BrickParameters.CalculateAvailableArea(length, width, holeRadius);
 
             if (availableArea.availableLength <= 0 || availableArea.availableWidth <= 0)
@@ -87,6 +89,7 @@ namespace BrickPluginModels.Services
             int totalHoles, double length, double width, double holeRadius)
         {
             var result = new HoleDistributionResult { StaggerOffset = 0 };
+            //TODO: RSDN
             var availableArea = BrickParameters.CalculateAvailableArea(length, width, holeRadius);
 
             if (totalHoles <= 1)

@@ -264,7 +264,6 @@ namespace BrickPluginModels.Models
                     string displayName = GetParameterDisplayName(kvp.Key);
                     string minValue = kvp.Value.MinValue.ToString("F0");
                     string maxValue = kvp.Value.MaxValue.ToString("F0");
-                    //TODO: RSDN +
                     errorMessages.Add($"• {displayName}: " +
                         $"должно быть в диапазоне [{minValue}, {maxValue}]");
                 }
@@ -296,7 +295,6 @@ namespace BrickPluginModels.Models
         /// <param name="width">Ширина кирпича.</param>
         /// <param name="holeRadius">Радиус отверстия.</param>
         /// <returns>Кортеж с diameter, edgeMargin, minGap, availableLength, availableWidth.</returns>
-        /// //TODO: RSDN +
         public static (double diameter, double edgeMargin, 
             double minGap, double availableLength,
             double availableWidth) CalculateAvailableArea(
@@ -331,6 +329,7 @@ namespace BrickPluginModels.Models
             double maximumRadius = (width - 2 * MinimumEdgeMargin) / 2.0;
             if (holeRadius > maximumRadius)
             {
+                //TODO: RSDN
                 errorMessage = "• Радиус отверстий слишком большой для данной ширины кирпича";
                 return false;
             }
@@ -353,6 +352,7 @@ namespace BrickPluginModels.Models
                 double maximumHoles = CalculateMaxHoles(length, width, holeRadius);
                 if (holesCount > maximumHoles)
                 {
+                    //TODO: RSDN
                     string distributionType = _distributionType == HoleDistributionType.Straight
                         ? "прямого"
                         : "шахматного";
@@ -375,6 +375,7 @@ namespace BrickPluginModels.Models
         private double CalculateMaxHoles(double length, double width, double holeRadius)
         {
             return _distributionType == HoleDistributionType.Straight
+                //TODO: RSDN
                 ? _distributionCalculator.CalculateMaxHolesStraight(length, width, holeRadius)
                 : _distributionCalculator.CalculateMaxHolesStaggered(length, width, holeRadius);
         }

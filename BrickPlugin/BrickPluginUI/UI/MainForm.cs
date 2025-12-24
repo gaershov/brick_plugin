@@ -15,19 +15,16 @@ namespace BrickPluginUI
         /// <summary>
         /// Строитель кирпичей.
         /// </summary>
-        //TODO: XML +
         private BrickBuilder _builder;
 
         /// <summary>
         /// Параметры кирпича.
         /// </summary>
-        //TODO: XML +
         private BrickParameters _parameters;
 
         /// <summary>
         /// Словарь соответствия типов параметров и текстовых полей.
         /// </summary>
-        //TODO: XML +
         private Dictionary<ParameterType, TextBox> _textBoxMap;
 
         /// <summary>
@@ -248,6 +245,7 @@ namespace BrickPluginUI
         /// </summary>
         /// <param name="sender">Источник события.</param>
         /// <param name="e">Аргументы события.</param>
+        /// //TODO: RSDN
         private void button_Build_Click(object sender, EventArgs e)
         {
             BuildModel();
@@ -298,6 +296,7 @@ namespace BrickPluginUI
         /// </summary>
         /// <param name="sender">Источник события.</param>
         /// <param name="e">Аргументы события.</param>
+        /// //TODO: refactor
         private void OnCalculateVoidnessClick(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(textBox_VoidnessValue.Text))

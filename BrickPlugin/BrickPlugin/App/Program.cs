@@ -3,6 +3,7 @@ using System.Windows.Forms;
 
 namespace BrickPlugin
 {
+    //TODO: remove
     static class Program
     {
         /// <summary>

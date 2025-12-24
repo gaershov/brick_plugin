@@ -136,7 +136,6 @@ namespace BrickPlugin.Tests
         }
 
         [Test]
-        //TODO: RSDN +
         [Description("Validate возвращает false, если значение " +
             "параметра выходит за допустимый диапазон")]
         public void Validate_WithValueOutOfRange_ShouldReturnFalse()
@@ -169,6 +168,7 @@ namespace BrickPlugin.Tests
         }
 
         [Test]
+        //TODO: RSDN
         [Description("Validate возвращает false для слишком большого количества отверстий")]
         public void Validate_WithTooManyHoles_ShouldReturnFalse()
         {
@@ -211,6 +211,7 @@ namespace BrickPlugin.Tests
         public void DistributionType_Change_ShouldUpdateDependentParameters()
         {
             var parameters = new BrickParameters();
+            //TODO: RSDN
             var initialMaxHoles = parameters.GetParameter(ParameterType.HolesCount).MaxValue;
 
             parameters.DistributionType = HoleDistributionType.Staggered;
@@ -284,6 +285,7 @@ namespace BrickPlugin.Tests
         }
 
         [Test]
+        //TODO: RSDN
         [Description("CalculateOptimalParameters возвращает ошибку для пустотности больше 45")]
         public void CalculateOptimalParameters_Above45_ShouldReturnError()
         {
@@ -309,6 +311,7 @@ namespace BrickPlugin.Tests
         }
 
         [Test]
+        //TODO: RSDN
         [Description("CalculateHolesCountForVoidness возвращает ошибку для пустотности больше 45")]
         public void CalculateHolesCountForVoidness_Above45_ShouldReturnError()
         {

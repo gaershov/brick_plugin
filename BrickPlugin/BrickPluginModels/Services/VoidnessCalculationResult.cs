@@ -3,6 +3,7 @@ using System;
 
 namespace BrickPluginModels.Services
 {
+    //TODO: RSDN
     /// <summary>
     /// Результат расчета пустотности.
     /// </summary>
