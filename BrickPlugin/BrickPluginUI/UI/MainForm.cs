@@ -326,7 +326,8 @@ namespace BrickPluginUI
             if (targetVoidness <= 0 || targetVoidness > 45)
             {
                 MessageBox.Show(
-                    $"Пустотность должна быть в диапазоне от 0 до 45%.\nВведено: {targetVoidness:F2}%",
+                    $"Пустотность должна быть в диапазоне " +
+                    $"от 0 до 45%.\nВведено: {targetVoidness:F2}%",
                     "Недопустимое значение",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
@@ -353,10 +354,12 @@ namespace BrickPluginUI
                         : "шахматного";
 
                     DialogResult dialogResult = MessageBox.Show(
-                        $"Для радиуса {holeRadius:F1} мм при {distributionName} распределении " +
+                        $"Для радиуса {holeRadius:F1} мм при " +
+                        $"{distributionName} распределении " +
                         $"доступна пустотность от {range.min:F2}% до {range.max:F2}%.\n\n" +
                         $"Введённое значение: {targetVoidness:F2}%\n\n" +
-                        $"Пересчитать радиус автоматически для достижения {targetVoidness:F2}%?",
+                        $"Пересчитать радиус автоматически для достижения " +
+                        $"{targetVoidness:F2}%?",
                         "Пустотность недостижима",
                         MessageBoxButtons.YesNo,
                         MessageBoxIcon.Question);
@@ -417,7 +420,7 @@ namespace BrickPluginUI
         /// <summary>
         /// Рассчитывает оптимальные параметры отверстий для заданной пустотности.
         /// </summary>
-        /// <param name="targetVoidness">Целевая пустотность в процентах.</param>
+        /// <param name="targetVoidness">Целевая пустотность.</param>
         /// <param name="length">Длина кирпича.</param>
         /// <param name="width">Ширина кирпича.</param>
         /// <param name="height">Высота кирпича.</param>

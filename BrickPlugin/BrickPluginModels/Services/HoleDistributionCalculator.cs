@@ -7,8 +7,6 @@ namespace BrickPluginModels.Services
 {
     /// <summary>
     /// Калькулятор распределения отверстий в кирпиче.
-    /// Поддерживает два режима: прямое распределение (без смещения) 
-    /// и шахматное распределение (со смещением чередующихся рядов).
     /// </summary>
     public class HoleDistributionCalculator
     {
@@ -59,7 +57,6 @@ namespace BrickPluginModels.Services
             double verticalStep = availableArea.diameter + availableArea.minGap;
             double staggerOffset = horizontalStep / 2.0;
 
-            // Рассчитываем максимально возможное количество рядов по физическим ограничениям
             int maxRows = Math.Max(1,
                 (int)Math.Floor((availableArea.availableWidth + verticalStep)
                 / verticalStep));
@@ -175,7 +172,7 @@ namespace BrickPluginModels.Services
             (double diameter, double edgeMargin, double minGap,
              double availableLength, double availableWidth) availableArea)
         {
-            // начинаем с минимум 2 рядов
+            // фор экземпл начинаем с минимум 2 рядов
             // если физически помещается только 1 ряд, используем 1
             int minRows = Math.Min(2, maxRows);
 
@@ -191,7 +188,8 @@ namespace BrickPluginModels.Services
         }
 
         /// <summary>
-        /// Проверяет, может ли заданное количество отверстий поместиться в указанное количество рядов.
+        /// Проверяет, может ли заданное количество отверстий
+        /// поместиться в указанное количество рядов.
         /// </summary>
         /// <param name="totalHoles">Общее количество отверстий.</param>
         /// <param name="rows">Количество рядов.</param>

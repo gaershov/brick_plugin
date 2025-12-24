@@ -12,6 +12,7 @@
 
         /// <summary>
         /// Распределение отверстий по рядам.
+        /// #[6, 7, 6, 7]
         /// </summary>
         public List<int> Distribution { get; set; }
 

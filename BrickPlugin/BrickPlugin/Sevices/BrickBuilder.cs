@@ -17,7 +17,7 @@ namespace BrickPlugin.Services
         private readonly HoleDistributionCalculator _distributionCalculator;
 
         /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="BrickBuilder"/>.
+        /// Инициализирует новый экземпляр класса.
         /// </summary>
         public BrickBuilder()
         {
@@ -125,6 +125,7 @@ namespace BrickPlugin.Services
                 : _distributionCalculator.CalculateStaggeredDistribution
                 (holesCount, length, width, holeRadius);
 
+            //прямое или шахматное
             if (distributionType == HoleDistributionType.Straight)
             {
                 PlaceHolesStraight(document2D, distribution, holeRadius, length, width);
@@ -175,7 +176,7 @@ namespace BrickPlugin.Services
         }
 
         /// <summary>
-        /// Размещает отверстия шахматным способом со смещением чередующихся рядов.
+        /// Размещает отверстия шахматным способом со смещением рядов.
         /// </summary>
         /// <param name="document2D">2D-документ для рисования окружностей.</param>
         /// <param name="distribution">Результат расчета распределения отверстий.</param>
