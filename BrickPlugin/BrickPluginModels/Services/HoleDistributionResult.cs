@@ -1,4 +1,4 @@
-﻿namespace BrickPluginModels.Models
+﻿namespace BrickPluginModels.Services
 {
     /// <summary>
     /// Результат расчета размещения отверстий.

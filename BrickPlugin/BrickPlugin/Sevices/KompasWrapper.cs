@@ -46,9 +46,6 @@ namespace BrickPlugin.Services
             _kompas = (KompasObject)Activator.CreateInstance(t);
             _kompas.Visible = true;
             _kompas.ActivateControllerAPI();
-
-            //TODO: костыли?
-            Thread.Sleep(800);
         }
 
         /// <summary>
@@ -135,6 +132,19 @@ namespace BrickPlugin.Services
             def.SetSketch(sketch);
             def.SetSideParam(false,(short)End_Type.etThroughAll, 0, 0, true);
             op.Create();
+        }
+
+        /// <summary>
+        /// Закрывает текущий документ без сохранения.
+        /// </summary>
+        public void CloseDocument()
+        {
+            if (_doc3D != null)
+            {
+                _doc3D.close();
+                _doc3D = null;
+                _part = null;
+            }
         }
     }
 }

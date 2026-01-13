@@ -1,9 +1,10 @@
-﻿using System;
+﻿using BrickPlugin.Services;
+using BrickPluginModels.Models;
+using BrickPluginModels.Services;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Forms;
-using BrickPluginModels.Models;
-using BrickPlugin.Services;
 
 namespace BrickPluginUI
 {
@@ -142,7 +143,7 @@ namespace BrickPluginUI
         {
             if (string.IsNullOrWhiteSpace(textBox.Text))
             {
-                textBox.BackColor = Color.White;
+                textBox.BackColor = Color.LightCoral;
                 return;
             }
 
@@ -171,7 +172,13 @@ namespace BrickPluginUI
             foreach (var kvp in _textBoxMap)
             {
                 var param = _parameters.GetParameter(kvp.Key);
-                if (param.IsValid)
+
+                // ИСПРАВЛЕНИЕ: проверяем также, что поле не пустое
+                if (string.IsNullOrWhiteSpace(kvp.Value.Text))
+                {
+                    kvp.Value.BackColor = Color.LightCoral;
+                }
+                else if (param.IsValid)
                 {
                     kvp.Value.BackColor = Color.White;
                 }
@@ -206,20 +213,20 @@ namespace BrickPluginUI
         }
 
         /// <summary>
-        /// Обновляет цвет фона текстового поля в зависимости от валидности значения.
+        /// Обновляет цвет фона конкретного поля.
         /// </summary>
         /// <param name="paramType">Тип параметра.</param>
         /// <param name="textBox">Текстовое поле.</param>
         private void UpdateFieldColor(ParameterType paramType, TextBox textBox)
         {
+            var param = _parameters.GetParameter(paramType);
+
+            // ИСПРАВЛЕНИЕ: проверяем также, что поле не пустое
             if (string.IsNullOrWhiteSpace(textBox.Text))
             {
-                textBox.BackColor = Color.White;
-                return;
+                textBox.BackColor = Color.LightCoral;
             }
-
-            var param = _parameters.GetParameter(paramType);
-            if (param.IsValid)
+            else if (param.IsValid)
             {
                 textBox.BackColor = Color.White;
             }
@@ -230,14 +237,17 @@ namespace BrickPluginUI
         }
 
         /// <summary>
-        /// Обрабатывает событие появления ошибки валидации.
+        /// Обрабатывает появление ошибки валидации.
         /// </summary>
         /// <param name="sender">Источник события.</param>
         /// <param name="errorMessage">Сообщение об ошибке.</param>
         private void OnErrorAppeared(object sender, string errorMessage)
         {
-            MessageBox.Show(errorMessage, "Ошибка валидации",
-                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show(
+                errorMessage,
+                "Ошибка валидации",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
         }
 
         /// <summary>
@@ -245,50 +255,71 @@ namespace BrickPluginUI
         /// </summary>
         /// <param name="sender">Источник события.</param>
         /// <param name="e">Аргументы события.</param>
-        /// //TODO: RSDN
-        private void button_Build_Click(object sender, EventArgs e)
+        /// //TODO: RSDN +
+        private void OnBuildClick(object sender, EventArgs e)
         {
-            BuildModel();
+            if (!ValidateAllFieldsFilled())
+            {
+                MessageBox.Show(
+                    "Пожалуйста, заполните все поля корректными " +
+                    "числовыми значениями перед построением модели.\n\n" +
+                    "Поля с ошибками подсвечены красным цветом.",
+                    "Ошибка ввода данных",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (_parameters.Validate())
+            {
+                try
+                {
+                    _builder.Build(_parameters);
+
+                    MessageBox.Show(
+                        "Построение завершено успешно!",
+                        "Успех",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"Произошла ошибка при " +
+                        $"построении модели:\n{ex.Message}",
+                        "Ошибка",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
+            }
         }
 
         /// <summary>
-        /// Выполняет построение модели кирпича.
+        /// Проверяет, что все текстовые поля заполнены и содержат корректные числовые значения.
         /// </summary>
-        private void BuildModel()
+        /// <returns>True, если все поля заполнены и корректны; иначе False.</returns>
+        private bool ValidateAllFieldsFilled()
         {
-            try
+            bool allValid = true;
+
+            foreach (var kvp in _textBoxMap)
             {
-                foreach (var textBox in _textBoxMap.Values)
+                // Проверка на пустое поле
+                if (string.IsNullOrWhiteSpace(kvp.Value.Text))
                 {
-                    textBox.BackColor = Color.White;
+                    kvp.Value.BackColor = Color.LightCoral;
+                    allValid = false;
+                    continue;
                 }
-
-                button_Build.Enabled = false;
-                button_Build.Text = "Построение...";
-                Application.DoEvents();
-
-                if (!_parameters.Validate())
+                if (!double.TryParse(kvp.Value.Text, NumberStyles.Any,
+                    CultureInfo.InvariantCulture, out double _))
                 {
-                    button_Build.Enabled = true;
-                    button_Build.Text = "Построить кирпич";
-                    return;
+                    kvp.Value.BackColor = Color.LightCoral;
+                    allValid = false;
                 }
+            }
 
-                _builder.Build(_parameters);
-
-                MessageBox.Show("✓ Модель успешно построена в КОМПАС-3D!",
-                    "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"✗ Ошибка при построении:\n\n{ex.Message}",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                button_Build.Enabled = true;
-                button_Build.Text = "Построить кирпич";
-            }
+            return allValid;
         }
 
         /// <summary>
@@ -296,9 +327,39 @@ namespace BrickPluginUI
         /// </summary>
         /// <param name="sender">Источник события.</param>
         /// <param name="e">Аргументы события.</param>
-        /// //TODO: refactor
+        /// //TODO: refactor +
         private void OnCalculateVoidnessClick(object sender, EventArgs e)
         {
+            if (!ValidateVoidnessInput(out double targetVoidness))
+            {
+                return;
+            }
+
+            double holeRadius = _parameters[ParameterType.HoleRadius];
+
+            if (holeRadius >= 2)
+            {
+                CalculateWithFixedRadius(targetVoidness, holeRadius);
+            }
+            else
+            {
+                double length = _parameters[ParameterType.Length];
+                double width = _parameters[ParameterType.Width];
+                double height = _parameters[ParameterType.Height];
+                CalculateOptimalParameters
+                    (targetVoidness, length, width, height);
+            }
+        }
+
+        /// <summary>
+        /// Проверяет введенное значение пустотности на корректность.
+        /// </summary>
+        /// <param name="targetVoidness">Выходное значение пустотности.</param>
+        /// <returns>True, если значение корректно; иначе False.</returns>
+        private bool ValidateVoidnessInput(out double targetVoidness)
+        {
+            targetVoidness = 0;
+
             if (string.IsNullOrWhiteSpace(textBox_VoidnessValue.Text))
             {
                 MessageBox.Show(
@@ -306,11 +367,11 @@ namespace BrickPluginUI
                     "Пустое значение",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
-                return;
+                return false;
             }
 
             if (!double.TryParse(textBox_VoidnessValue.Text, NumberStyles.Any,
-                CultureInfo.InvariantCulture, out double targetVoidness))
+                CultureInfo.InvariantCulture, out targetVoidness))
             {
                 MessageBox.Show(
                     "Введено некорректное значение пустотности." +
@@ -319,7 +380,7 @@ namespace BrickPluginUI
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
                 textBox_VoidnessValue.BackColor = Color.LightCoral;
-                return;
+                return false;
             }
 
             if (targetVoidness <= 0 || targetVoidness > 45)
@@ -331,89 +392,120 @@ namespace BrickPluginUI
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
                 textBox_VoidnessValue.BackColor = Color.LightCoral;
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Выполняет расчет количества отверстий при фиксированном радиусе.
+        /// </summary>
+        /// <param name="targetVoidness">Целевая пустотность.</param>
+        /// <param name="holeRadius">Фиксированный радиус отверстия.</param>
+        private void CalculateWithFixedRadius(double targetVoidness, double holeRadius)
+        {
+            var range = _parameters.GetVoidnessRange();
+
+            if (targetVoidness < range.min || targetVoidness > range.max)
+            {
+                HandleUnachievableVoidness(targetVoidness, holeRadius, range);
                 return;
             }
 
-            double length = _parameters[ParameterType.Length];
-            double width = _parameters[ParameterType.Width];
-            double height = _parameters[ParameterType.Height];
-            double holeRadius = _parameters[ParameterType.HoleRadius];
+            var calculationResult =
+                _parameters.CalculateHolesCountForVoidness(targetVoidness);
 
-            // Если радиус задан корректно
-            if (holeRadius >= 2)
+            if (calculationResult.Success)
             {
-                // Проверяем доступный диапазон пустотности для этого радиуса
-                var range = _parameters.GetVoidnessRange();
-
-                if (targetVoidness < range.min || targetVoidness > range.max)
-                {
-                    string distributionName = _parameters.DistributionType 
-                        == HoleDistributionType.Straight
-                        ? "прямого"
-                        : "шахматного";
-
-                    DialogResult dialogResult = MessageBox.Show(
-                        $"Для радиуса {holeRadius:F1} мм при " +
-                        $"{distributionName} распределении " +
-                        $"доступна пустотность от {range.min:F2}% до {range.max:F2}%.\n\n" +
-                        $"Введённое значение: {targetVoidness:F2}%\n\n" +
-                        $"Пересчитать радиус автоматически для достижения " +
-                        $"{targetVoidness:F2}%?",
-                        "Пустотность недостижима",
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Question);
-
-                    if (dialogResult == DialogResult.Yes)
-                    {
-                        // Автоматический подбор радиуса и количества
-                        CalculateOptimalParameters(targetVoidness, length, width, height);
-                    }
-                    else
-                    {
-                        textBox_VoidnessValue.BackColor = Color.LightCoral;
-                    }
-
-                    return;
-                }
-
-                // Пустотность достижима - рассчитываем количество отверстий
-                var calculationResult = _parameters.CalculateHolesCountForVoidness(targetVoidness);
-
-                if (calculationResult.Success)
-                {
-                    _isUpdatingProgrammatically = true;
-                    textBox_HolesCountValue.Text = 
-                        calculationResult.HolesCount.ToString(CultureInfo.InvariantCulture);
-                    _parameters[ParameterType.HolesCount] = calculationResult.HolesCount;
-                    textBox_VoidnessValue.BackColor = Color.LightGreen;
-                    _isUpdatingProgrammatically = false;
-
-                    UpdateCurrentVoidness();
-
-                    MessageBox.Show(
-                        $"✓ Параметры успешно рассчитаны!\n\n" +
-                        $"Радиус отверстий: {holeRadius:F1} мм\n" +
-                        $"Количество отверстий: {calculationResult.HolesCount} шт\n" +
-                        $"Фактическая пустотность: {calculationResult.ActualVoidness:F2}%",
-                        "Расчёт завершён",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information);
-                }
-                else
-                {
-                    MessageBox.Show(
-                        calculationResult.ErrorMessage,
-                        "Ошибка расчёта",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                    textBox_VoidnessValue.BackColor = Color.LightCoral;
-                }
+                ApplyCalculationResult(calculationResult, holeRadius);
             }
             else
             {
-                // Радиус не задан - автоматический подбор
+                ShowCalculationError(calculationResult.ErrorMessage);
+            }
+        }
+
+        /// <summary>
+        /// Обрабатывает случай, когда пустотность недостижима для текущего радиуса.
+        /// </summary>
+        /// <param name="targetVoidness">Целевая пустотность.</param>
+        /// <param name="holeRadius">Текущий радиус отверстия.</param>
+        /// <param name="range">Доступный диапазон пустотности.</param>
+        private void HandleUnachievableVoidness(
+            double targetVoidness,
+            double holeRadius,
+            (double min, double max) range)
+        {
+            string distributionName = _parameters.DistributionType
+                == HoleDistributionType.Straight
+                ? "прямого"
+                : "шахматного";
+
+            DialogResult dialogResult = MessageBox.Show(
+                $"Для радиуса {holeRadius:F1} мм при " +
+                $"{distributionName} распределении " +
+                $"доступна пустотность от {range.min:F2}% до {range.max:F2}%.\n\n" +
+                $"Введённое значение: {targetVoidness:F2}%\n\n" +
+                $"Пересчитать радиус автоматически для достижения " +
+                $"{targetVoidness:F2}%?",
+                "Пустотность недостижима",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (dialogResult == DialogResult.Yes)
+            {
+                double length = _parameters[ParameterType.Length];
+                double width = _parameters[ParameterType.Width];
+                double height = _parameters[ParameterType.Height];
                 CalculateOptimalParameters(targetVoidness, length, width, height);
             }
+            else
+            {
+                textBox_VoidnessValue.BackColor = Color.LightCoral;
+            }
+        }
+
+        /// <summary>
+        /// Применяет результат успешного расчета к параметрам.
+        /// </summary>
+        /// <param name="result">Результат расчета.</param>
+        /// <param name="holeRadius">Радиус отверстия.</param>
+        private void ApplyCalculationResult(
+            VoidnessCalculationResult result,
+            double holeRadius)
+        {
+            _isUpdatingProgrammatically = true;
+            textBox_HolesCountValue.Text =
+                result.HolesCount.ToString(CultureInfo.InvariantCulture);
+            _parameters[ParameterType.HolesCount] = result.HolesCount;
+            textBox_VoidnessValue.BackColor = Color.LightGreen;
+            _isUpdatingProgrammatically = false;
+
+            UpdateCurrentVoidness();
+
+            MessageBox.Show(
+                $"✓ Параметры успешно рассчитаны!\n\n" +
+                $"Радиус отверстий: {holeRadius:F1} мм\n" +
+                $"Количество отверстий: {result.HolesCount} шт\n" +
+                $"Фактическая пустотность: {result.ActualVoidness:F2}%",
+                "Расчёт завершён",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+
+        /// <summary>
+        /// Отображает сообщение об ошибке расчета.
+        /// </summary>
+        /// <param name="errorMessage">Сообщение об ошибке.</param>
+        private void ShowCalculationError(string errorMessage)
+        {
+            MessageBox.Show(
+                errorMessage,
+                "Ошибка расчёта",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+            textBox_VoidnessValue.BackColor = Color.LightCoral;
         }
 
         /// <summary>
@@ -423,7 +515,7 @@ namespace BrickPluginUI
         /// <param name="length">Длина кирпича.</param>
         /// <param name="width">Ширина кирпича.</param>
         /// <param name="height">Высота кирпича.</param>
-        private void CalculateOptimalParameters(double targetVoidness, 
+        private void CalculateOptimalParameters(double targetVoidness,
             double length, double width, double height)
         {
             var optimalResult = _parameters.CalculateOptimalParameters(targetVoidness);
@@ -431,12 +523,15 @@ namespace BrickPluginUI
             if (optimalResult.Success)
             {
                 _isUpdatingProgrammatically = true;
-                textBox_HoleRadiusValue.Text = 
-                    optimalResult.HoleRadius.ToString("F1", CultureInfo.InvariantCulture);
-                textBox_HolesCountValue.Text = 
+                textBox_HoleRadiusValue.Text =
+                    optimalResult.HoleRadius.
+                    ToString("F1", CultureInfo.InvariantCulture);
+                textBox_HolesCountValue.Text =
                     optimalResult.HolesCount.ToString(CultureInfo.InvariantCulture);
-                _parameters[ParameterType.HoleRadius] = optimalResult.HoleRadius;
-                _parameters[ParameterType.HolesCount] = optimalResult.HolesCount;
+                _parameters[ParameterType.HoleRadius]
+                    = optimalResult.HoleRadius;
+                _parameters[ParameterType.HolesCount]
+                    = optimalResult.HolesCount;
                 textBox_VoidnessValue.BackColor = Color.LightGreen;
                 _isUpdatingProgrammatically = false;
 
@@ -454,7 +549,7 @@ namespace BrickPluginUI
             else
             {
                 MessageBox.Show(
-                    optimalResult.ErrorMessage ?? 
+                    optimalResult.ErrorMessage ??
                     "Не удалось подобрать параметры для заданной пустотности.",
                     "Ошибка расчёта",
                     MessageBoxButtons.OK,
@@ -468,8 +563,10 @@ namespace BrickPluginUI
         /// </summary>
         private void UpdateCurrentVoidness()
         {
-            double holeRadius = _parameters[ParameterType.HoleRadius];
-            int holesCount = (int)_parameters[ParameterType.HolesCount];
+            double holeRadius
+                = _parameters[ParameterType.HoleRadius];
+            int holesCount
+                = (int)_parameters[ParameterType.HolesCount];
 
             if (holesCount > 0 && holeRadius >= 2)
             {

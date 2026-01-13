@@ -14,7 +14,10 @@ namespace BrickPlugin.Services
         /// </summary>
         private readonly KompasWrapper _kompasWrapper;
 
-        //TODO: XML
+        /// <summary>
+        /// Калькулятор распределения отверстий в кирпиче.
+        /// </summary>
+        //TODO: RSDN +
         private readonly HoleDistributionCalculator _distributionCalculator;
 
         /// <summary>
@@ -27,9 +30,17 @@ namespace BrickPlugin.Services
         }
 
         /// <summary>
+        /// Закрывает текущий документ без сохранения.
+        /// </summary>
+        public void CloseDocument()
+        {
+            _kompasWrapper.CloseDocument();
+        }
+
+        /// <summary>
         /// Строит 3D-модель кирпича с заданными параметрами.
         /// </summary>
-        /// <param name="parameters">Параметры кирпича (размеры, количество и радиус отверстий).</param>
+        /// <param name="parameters">Параметры кирпича.</param>
         public void Build(BrickParameters parameters)
         {
             _kompasWrapper.OpenKompas();
@@ -119,7 +130,7 @@ namespace BrickPlugin.Services
                 return;
             }
 
-            HoleDistributionResult distribution 
+            HoleDistributionResult distribution
                 = distributionType == HoleDistributionType.Straight
                 ? _distributionCalculator.CalculateStraightDistribution
                 (holesCount, length, width, holeRadius)
@@ -152,8 +163,9 @@ namespace BrickPlugin.Services
             double length,
             double width)
         {
-            //TODO: RSDN
-            var availableArea = BrickParameters.CalculateAvailableArea(length, width, holeRadius);
+            //TODO: RSDN +
+            var availableArea =
+                BrickParameters.CalculateAvailableArea(length, width, holeRadius);
             double holeDiameter = availableArea.diameter;
             double horizontalStep = holeDiameter + distribution.HorizontalGap;
             double verticalStep = holeDiameter + distribution.VerticalGap;

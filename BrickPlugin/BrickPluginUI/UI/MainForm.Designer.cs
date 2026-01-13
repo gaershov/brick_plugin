@@ -414,7 +414,7 @@ namespace BrickPluginUI
             button_Build.TabIndex = 7;
             button_Build.Text = "Построить кирпич";
             button_Build.UseVisualStyleBackColor = false;
-            button_Build.Click += button_Build_Click;
+            button_Build.Click += OnBuildClick;
             // 
             // MainForm
             // 

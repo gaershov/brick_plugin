@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <COMReference Include="{0422828c-f174-495e-ac5d-d31014dbbe87}">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>0422828c-f174-495e-ac5d-d31014dbbe87</Guid>
+    </COMReference>
+    <COMReference Include="{2caf168c-7961-4b90-9da2-701419beefe3}">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>2caf168c-7961-4b90-9da2-701419beefe3</Guid>
+    </COMReference>
+    <COMReference Include="{75c9f5d0-b5b8-4526-8681-9903c567d2ed}">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>75c9f5d0-b5b8-4526-8681-9903c567d2ed</Guid>
+    </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BrickPluginModels\BrickPluginModels.csproj" />
+    <ProjectReference Include="..\BrickPlugin\BrickPlugin.csproj" />
+  </ItemGroup>
+
+</Project>

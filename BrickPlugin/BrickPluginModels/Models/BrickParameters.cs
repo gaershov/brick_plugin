@@ -192,7 +192,8 @@ namespace BrickPluginModels.Models
         /// </summary>
         /// <param name="targetVoidness">Желаемая пустотность в процентах.</param>
         /// <returns>Результат расчёта с количеством отверстий.</returns>
-        public VoidnessCalculationResult CalculateHolesCountForVoidness(double targetVoidness)
+        public VoidnessCalculationResult CalculateHolesCountForVoidness(
+            double targetVoidness)
         {
             double length = _parameters[ParameterType.Length].Value;
             double width = _parameters[ParameterType.Width].Value;
@@ -204,7 +205,7 @@ namespace BrickPluginModels.Models
         }
 
         /// <summary>
-        /// Получает доступный диапазон пустотности для текущих параметров кирпича.
+        /// Получает диапазон возможной пустотности для текущих параметров.
         /// </summary>
         /// <returns>Кортеж с минимальной и максимальной пустотностью.</returns>
         public (double min, double max) GetVoidnessRange()
@@ -227,12 +228,12 @@ namespace BrickPluginModels.Models
             double width = _parameters[ParameterType.Width].Value;
             double holeRadius = _parameters[ParameterType.HoleRadius].Value;
 
+            // ИСПРАВЛЕНИЕ: Максимальный радиус зависит только от геометрии кирпича
+            // Радиус ограничен шириной кирпича с учётом минимальных отступов от краёв
             double geometricMaxRadius = (width - 2 * MinimumEdgeMargin) / 2.0;
-            double voidnessMaxRadius = Math.Sqrt(0.45 * length * width / Math.PI);
 
-            // Берём минимум из двух ограничений
-            double maximumRadius = Math.Min(geometricMaxRadius, voidnessMaxRadius);
-            _parameters[ParameterType.HoleRadius].MaxValue = Math.Max(2, maximumRadius);
+            // Устанавливаем максимальный радиус (минимум 2 мм)
+            _parameters[ParameterType.HoleRadius].MaxValue = Math.Max(2, geometricMaxRadius);
 
             MaxRadiusChanged?.Invoke(this, GetMaxRadiusHint());
 
@@ -279,7 +280,7 @@ namespace BrickPluginModels.Models
 
             if (errorMessages.Count > 0)
             {
-                string message = "Обнаружены ошибки:\n\n" 
+                string message = "Обнаружены ошибки:\n\n"
                     + string.Join("\n", errorMessages);
                 ErrorMessage?.Invoke(this, message);
                 return false;
@@ -294,8 +295,10 @@ namespace BrickPluginModels.Models
         /// <param name="length">Длина кирпича.</param>
         /// <param name="width">Ширина кирпича.</param>
         /// <param name="holeRadius">Радиус отверстия.</param>
-        /// <returns>Кортеж с diameter, edgeMargin, minGap, availableLength, availableWidth.</returns>
-        public static (double diameter, double edgeMargin, 
+        /// <returns>
+        /// Кортеж с diameter, edgeMargin, minGap, availableLength, availableWidth.
+        /// </returns>
+        public static (double diameter, double edgeMargin,
             double minGap, double availableLength,
             double availableWidth) CalculateAvailableArea(
             double length, double width, double holeRadius
@@ -315,7 +318,9 @@ namespace BrickPluginModels.Models
         /// <summary>
         /// Проверяет бизнес-правила валидации параметров.
         /// </summary>
-        /// <param name="errorMessage">Сообщение об ошибке, если валидация не прошла.</param>
+        /// <param name="errorMessage">
+        /// Сообщение об ошибке, если валидация не прошла.
+        /// </param>
         /// <returns>True, если все правила соблюдены; иначе False.</returns>
         private bool ValidateBusinessRules(out string errorMessage)
         {
@@ -329,8 +334,9 @@ namespace BrickPluginModels.Models
             double maximumRadius = (width - 2 * MinimumEdgeMargin) / 2.0;
             if (holeRadius > maximumRadius)
             {
-                //TODO: RSDN
-                errorMessage = "• Радиус отверстий слишком большой для данной ширины кирпича";
+                //TODO: RSDN +
+                errorMessage =
+                    "• Радиус отверстий слишком большой для данной ширины кирпича";
                 return false;
             }
 
@@ -352,8 +358,9 @@ namespace BrickPluginModels.Models
                 double maximumHoles = CalculateMaxHoles(length, width, holeRadius);
                 if (holesCount > maximumHoles)
                 {
-                    //TODO: RSDN
-                    string distributionType = _distributionType == HoleDistributionType.Straight
+                    //TODO: RSDN +
+                    string distributionType =
+                        _distributionType == HoleDistributionType.Straight
                         ? "прямого"
                         : "шахматного";
                     errorMessage = $"• Количество отверстий превышает возможное для " +
@@ -375,9 +382,11 @@ namespace BrickPluginModels.Models
         private double CalculateMaxHoles(double length, double width, double holeRadius)
         {
             return _distributionType == HoleDistributionType.Straight
-                //TODO: RSDN
-                ? _distributionCalculator.CalculateMaxHolesStraight(length, width, holeRadius)
-                : _distributionCalculator.CalculateMaxHolesStaggered(length, width, holeRadius);
+                //TODO: RSDN +
+                ? _distributionCalculator.CalculateMaxHolesStraight(
+                    length, width, holeRadius)
+                : _distributionCalculator.CalculateMaxHolesStaggered(
+                    length, width, holeRadius);
         }
 
         /// <summary>
@@ -394,7 +403,6 @@ namespace BrickPluginModels.Models
                 ParameterType.Height => "Высота",
                 ParameterType.HoleRadius => "Радиус отверстий",
                 ParameterType.HolesCount => "Количество отверстий",
-                _ => parameter.ToString()
             };
         }
     }

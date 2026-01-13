@@ -17,13 +17,16 @@ namespace BrickPluginModels.Services
         /// <param name="width">Ширина кирпича в миллиметрах.</param>
         /// <param name="holeRadius">Радиус отверстия в миллиметрах.</param>
         /// <returns>Максимальное количество отверстий.</returns>
-        /// //TODO: RSDN
-        public int CalculateMaxHolesStraight(double length, double width, double holeRadius)
+        /// //TODO: RSDN +
+        public int CalculateMaxHolesStraight
+            (double length, double width, double holeRadius)
         {
-            //TODO: RSDN
-            var availableArea = BrickParameters.CalculateAvailableArea(length, width, holeRadius);
+            //TODO: RSDN +
+            var availableArea =
+                BrickParameters.CalculateAvailableArea(length, width, holeRadius);
 
-            if (availableArea.availableLength <= 0 || availableArea.availableWidth <= 0)
+            if (availableArea.availableLength <= 0
+                || availableArea.availableWidth <= 0)
             {
                 return 0;
             }
@@ -48,7 +51,8 @@ namespace BrickPluginModels.Services
         /// <returns>Максимальное количество отверстий.</returns>
         public int CalculateMaxHolesStaggered(double length, double width, double holeRadius)
         {
-            var availableArea = BrickParameters.CalculateAvailableArea(length, width, holeRadius);
+            var availableArea 
+                = BrickParameters.CalculateAvailableArea(length, width, holeRadius);
 
             if (availableArea.availableLength <= 0 || availableArea.availableWidth <= 0)
             {
@@ -59,9 +63,9 @@ namespace BrickPluginModels.Services
             double verticalStep = availableArea.diameter + availableArea.minGap;
             double staggerOffset = horizontalStep / 2.0;
 
+            // ИСПРАВЛЕНИЕ: убрана ошибочная добавка + verticalStep
             int maxRows = Math.Max(1,
-                (int)Math.Floor((availableArea.availableWidth + verticalStep)
-                / verticalStep));
+                (int)Math.Floor(availableArea.availableWidth / verticalStep) + 1);
 
             int columnsInEvenRows = Math.Max(1,
                 (int)Math.Floor((availableArea.availableLength + availableArea.minGap)
@@ -89,8 +93,9 @@ namespace BrickPluginModels.Services
             int totalHoles, double length, double width, double holeRadius)
         {
             var result = new HoleDistributionResult { StaggerOffset = 0 };
-            //TODO: RSDN
-            var availableArea = BrickParameters.CalculateAvailableArea(length, width, holeRadius);
+            //TODO: RSDN +
+            var availableArea =
+                BrickParameters.CalculateAvailableArea(length, width, holeRadius);
 
             if (totalHoles <= 1)
             {
@@ -138,16 +143,16 @@ namespace BrickPluginModels.Services
             int totalHoles, double length, double width, double holeRadius)
         {
             var result = new HoleDistributionResult();
-            var availableArea = 
+            var availableArea =
                 BrickParameters.CalculateAvailableArea(length, width, holeRadius);
 
             double horizontalStep = availableArea.diameter + availableArea.minGap;
             double verticalStep = availableArea.diameter + availableArea.minGap;
             double staggerOffset = horizontalStep / 2.0;
 
+            // ИСПРАВЛЕНИЕ: убрана ошибочная добавка + verticalStep
             int maxPossibleRows = Math.Max(3,
-                (int)Math.Floor((availableArea.availableWidth + verticalStep) 
-                / verticalStep));
+                (int)Math.Floor(availableArea.availableWidth / verticalStep) + 1);
 
             int optimalRowsCount = FindOptimalRowsCount(
                 totalHoles, maxPossibleRows, availableArea);

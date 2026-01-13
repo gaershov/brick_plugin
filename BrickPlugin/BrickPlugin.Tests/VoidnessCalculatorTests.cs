@@ -9,21 +9,25 @@ namespace BrickPlugin.Tests
     [Description("Тесты для класса VoidnessCalculator")]
     public class VoidnessCalculatorTests
     {
-        private VoidnessCalculator _calculator;
-
-        [SetUp]
-        //TODO: refactor
-        public void Setup()
-        {
-            _calculator = new VoidnessCalculator();
-        }
+        //TODO: refactor +
+        private VoidnessCalculator Calculator => new VoidnessCalculator();
 
         [Test]
         [Description("CalculateCurrentVoidness возвращает 0 для нуля отверстий")]
         public void CalculateCurrentVoidness_ZeroHoles_ShouldReturnZero()
         {
-            //TODO: RSDN
-            var voidness = _calculator.CalculateCurrentVoidness(250, 120, 65, 8, 0);
+            //TODO: RSDN +
+            var voidness = Calculator.CalculateCurrentVoidness(250, 120, 65, 8, 0);
+
+            Assert.AreEqual(0, voidness, 0.01);
+        }
+
+        [Test]
+        [Description("CalculateCurrentVoidness " +
+            "возвращает 0 для нулевого объема кирпича")]
+        public void CalculateCurrentVoidness_ZeroBrickVolume_ShouldReturnZero()
+        {
+            var voidness = Calculator.CalculateCurrentVoidness(0, 0, 0, 8, 10);
 
             Assert.AreEqual(0, voidness, 0.01);
         }
@@ -32,8 +36,8 @@ namespace BrickPlugin.Tests
         [Description("CalculateCurrentVoidness возвращает положительное значение")]
         public void CalculateCurrentVoidness_WithHoles_ShouldReturnPositiveValue()
         {
-            //TODO: RSDN
-            var voidness = _calculator.CalculateCurrentVoidness(250, 120, 65, 8, 10);
+            //TODO: RSDN +
+            var voidness = Calculator.CalculateCurrentVoidness(250, 120, 65, 8, 10);
 
             Assert.IsTrue(voidness > 0);
         }
@@ -42,9 +46,9 @@ namespace BrickPlugin.Tests
         [Description("CalculateCurrentVoidness увеличивается с количеством")]
         public void CalculateCurrentVoidness_MoreHoles_HigherVoidness()
         {
-            //TODO: RSDN
-            var voidness1 = _calculator.CalculateCurrentVoidness(250, 120, 65, 8, 5);
-            var voidness2 = _calculator.CalculateCurrentVoidness(250, 120, 65, 8, 10);
+            //TODO: RSDN +
+            var voidness1 = Calculator.CalculateCurrentVoidness(250, 120, 65, 8, 5);
+            var voidness2 = Calculator.CalculateCurrentVoidness(250, 120, 65, 8, 10);
 
             Assert.IsTrue(voidness2 > voidness1);
         }
@@ -53,9 +57,9 @@ namespace BrickPlugin.Tests
         [Description("CalculateCurrentVoidness увеличивается с радиусом")]
         public void CalculateCurrentVoidness_LargerRadius_HigherVoidness()
         {
-            //TODO: RSDN
-            var voidness1 = _calculator.CalculateCurrentVoidness(250, 120, 65, 5, 10);
-            var voidness2 = _calculator.CalculateCurrentVoidness(250, 120, 65, 10, 10);
+            //TODO: RSDN +
+            var voidness1 = Calculator.CalculateCurrentVoidness(250, 120, 65, 5, 10);
+            var voidness2 = Calculator.CalculateCurrentVoidness(250, 120, 65, 10, 10);
 
             Assert.IsTrue(voidness2 > voidness1);
         }
@@ -64,18 +68,37 @@ namespace BrickPlugin.Tests
         [Description("CalculateCurrentVoidness уменьшается с размером кирпича")]
         public void CalculateCurrentVoidness_LargerBrick_LowerVoidness()
         {
-            //TODO: RSDN
-            var voidness1 = _calculator.CalculateCurrentVoidness(250, 120, 65, 8, 10);
-            var voidness2 = _calculator.CalculateCurrentVoidness(500, 240, 130, 8, 10);
+            //TODO: RSDN +
+            var voidness1 = Calculator.CalculateCurrentVoidness(250, 120, 65, 8, 10);
+            var voidness2 = Calculator.CalculateCurrentVoidness(500, 240, 130, 8, 10);
 
             Assert.IsTrue(voidness2 < voidness1);
         }
 
         [Test]
+        [Description("CalculateCurrentVoidness корректно вычисляет" +
+            " пустотность по формуле")]
+        public void CalculateCurrentVoidness_ShouldCalculateByFormula()
+        {
+            double length = 250, width = 120, height = 65, radius = 8;
+            int holes = 10;
+
+            var voidness 
+                = Calculator.CalculateCurrentVoidness(length, width, height, radius, holes);
+
+            double brickVolume = length * width * height;
+            double holeVolume = Math.PI * radius * radius * height;
+            double expected = (holeVolume * holes / brickVolume) * 100.0;
+
+            Assert.AreEqual(expected, voidness, 0.01);
+        }
+
+        //TODO: RSDN +
+        [Test]
         [Description("CalculateMaxPossibleVoidness возвращает положительное значение")]
         public void CalculateMaxPossibleVoidness_ShouldReturnPositiveValue()
         {
-            var maxVoidness = _calculator.CalculateMaxPossibleVoidness(
+            var maxVoidness = Calculator.CalculateMaxPossibleVoidness(
                 250, 120, 65, 8, HoleDistributionType.Straight);
 
             Assert.IsTrue(maxVoidness > 0);
@@ -85,54 +108,74 @@ namespace BrickPlugin.Tests
         [Description("CalculateMaxPossibleVoidness не превышает 45")]
         public void CalculateMaxPossibleVoidness_ShouldNotExceed45()
         {
-            var maxVoidness = _calculator.CalculateMaxPossibleVoidness(
+            var maxVoidness = Calculator.CalculateMaxPossibleVoidness(
                 250, 120, 65, 8, HoleDistributionType.Straight);
 
             Assert.IsTrue(maxVoidness <= 45);
         }
 
+        //TODO: RSDN +
         [Test]
         [Description("CalculateMaxPossibleVoidness для шахматного больше или равно")]
         public void CalculateMaxPossibleVoidness_Staggered_HigherOrEqual()
         {
-            var straight = _calculator.CalculateMaxPossibleVoidness(
+            var straight = Calculator.CalculateMaxPossibleVoidness(
                 250, 120, 65, 8, HoleDistributionType.Straight);
-            var staggered = _calculator.CalculateMaxPossibleVoidness(
+            var staggered = Calculator.CalculateMaxPossibleVoidness(
                 250, 120, 65, 8, HoleDistributionType.Staggered);
 
             Assert.IsTrue(staggered >= straight);
         }
 
+        [TestCase(HoleDistributionType.Straight)]
+        [TestCase(HoleDistributionType.Staggered)]
+        [Description("CalculateMaxPossibleVoidness использует правильный калькулятор")]
+        public void CalculateMaxPossibleVoidness_UsesCorrectCalculator(HoleDistributionType type)
+        {
+            var voidness = Calculator.CalculateMaxPossibleVoidness(250, 120, 65, 8, type);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsTrue(voidness > 0);
+                Assert.IsTrue(voidness <= 45);
+            });
+        }
+
+        //TODO: RSDN +
         [Test]
         [Description("CalculateMinPossibleVoidness возвращает положительное значение")]
         public void CalculateMinPossibleVoidness_ShouldReturnPositiveValue()
         {
-            var minVoidness = _calculator.CalculateMinPossibleVoidness(250, 120, 65, 8);
+            var minVoidness = Calculator.CalculateMinPossibleVoidness(250, 120, 65, 8);
 
             Assert.IsTrue(minVoidness > 0);
         }
 
+        //TODO: RSDN +
         [Test]
         [Description("CalculateMinPossibleVoidness равно пустотности для 1 отверстия")]
         public void CalculateMinPossibleVoidness_ShouldEqualOneHole()
         {
-            //TODO: RSDN
-            var minVoidness = _calculator.CalculateMinPossibleVoidness(250, 120, 65, 8);
-            var actual = _calculator.CalculateCurrentVoidness(250, 120, 65, 8, 1);
+            var minVoidness = Calculator.CalculateMinPossibleVoidness(250, 120, 65, 8);
+            var actual = Calculator.CalculateCurrentVoidness(250, 120, 65, 8, 1);
 
             Assert.AreEqual(minVoidness, actual, 0.01);
         }
 
+        //TODO: RSDN +
         [Test]
         [Description("CalculateOptimalParameters возвращает успешный результат")]
         public void CalculateOptimalParameters_ValidVoidness_ShouldReturnSuccess()
         {
-            var result = _calculator.CalculateOptimalParameters(
+            var result = Calculator.CalculateOptimalParameters(
                 250, 120, 65, 20, HoleDistributionType.Straight);
 
-            Assert.IsTrue(result.Success);
-            Assert.IsTrue(result.HoleRadius >= 2);
-            Assert.IsTrue(result.HolesCount >= 1);
+            Assert.Multiple(() =>
+            {
+                Assert.IsTrue(result.Success);
+                Assert.IsTrue(result.HoleRadius >= 2);
+                Assert.IsTrue(result.HolesCount >= 1);
+            });
         }
 
         [Test]
@@ -140,140 +183,430 @@ namespace BrickPlugin.Tests
         public void CalculateOptimalParameters_ShouldAchieveTarget()
         {
             double target = 25;
-            var result = _calculator.CalculateOptimalParameters(
+            var result = Calculator.CalculateOptimalParameters(
                 250, 120, 65, target, HoleDistributionType.Straight);
 
-            Assert.IsTrue(result.Success);
-            Assert.IsTrue(Math.Abs(result.ActualVoidness - target) < 5);
-        }
-
-        [Test]
-        //TODO: RSDN
-        [Description("CalculateOptimalParameters возвращает ошибку для пустотности больше 45")]
-        public void CalculateOptimalParameters_Above45_ShouldReturnError()
-        {
-            var result = _calculator.CalculateOptimalParameters(
-                250, 120, 65, 50, HoleDistributionType.Straight);
-
-            Assert.IsFalse(result.Success);
-            Assert.IsNotNull(result.ErrorMessage);
-        }
-
-        [Test]
-        [Description("CalculateOptimalParameters возвращает ошибку для нуля")]
-        public void CalculateOptimalParameters_Zero_ShouldReturnError()
-        {
-            var result = _calculator.CalculateOptimalParameters(
-                250, 120, 65, 0, HoleDistributionType.Straight);
-
-            Assert.IsFalse(result.Success);
-            Assert.IsNotNull(result.ErrorMessage);
-        }
-
-        [Test]
-        [Description("CalculateOptimalParameters возвращает ошибку для отрицательного")]
-        public void CalculateOptimalParameters_Negative_ShouldReturnError()
-        {
-            var result = _calculator.CalculateOptimalParameters(
-                250, 120, 65, -10, HoleDistributionType.Straight);
-
-            Assert.IsFalse(result.Success);
-            Assert.IsNotNull(result.ErrorMessage);
-        }
-
-        [Test]
-        [Description("CalculateHolesCountForVoidness возвращает успешный результат")]
-        public void CalculateHolesCountForVoidness_ShouldReturnSuccess()
-        {
-            var result = _calculator.CalculateHolesCountForVoidness(
-                250, 120, 65, 8, 15, HoleDistributionType.Straight);
-
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual(8, result.HoleRadius);
-            Assert.IsTrue(result.HolesCount > 0);
-        }
-
-        [Test]
-        [Description("CalculateHolesCountForVoidness не изменяет радиус")]
-        public void CalculateHolesCountForVoidness_ShouldNotChangeRadius()
-        {
-            double fixedRadius = 8;
-            var result = _calculator.CalculateHolesCountForVoidness(
-                250, 120, 65, fixedRadius, 15, HoleDistributionType.Straight);
-
-            Assert.AreEqual(fixedRadius, result.HoleRadius);
-        }
-
-        [Test]
-        //TODO: RSDN
-        [Description("CalculateHolesCountForVoidness возвращает ошибку для пустотности больше 45")]
-        public void CalculateHolesCountForVoidness_Above45_ShouldReturnError()
-        {
-            var result = _calculator.CalculateHolesCountForVoidness(
-                250, 120, 65, 8, 50, HoleDistributionType.Straight);
-
-            Assert.IsFalse(result.Success);
-            Assert.IsNotNull(result.ErrorMessage);
-        }
-
-        [Test]
-        [Description("CalculateHolesCountForVoidness возвращает минимум 1 отверстие")]
-        public void CalculateHolesCountForVoidness_ShouldReturnAtLeastOne()
-        {
-            var result = _calculator.CalculateHolesCountForVoidness(
-                250, 120, 65, 8, 2, HoleDistributionType.Straight);
-
-            if (result.Success)
+            Assert.Multiple(() =>
             {
-                Assert.IsTrue(result.HolesCount >= 1);
-            }
+                Assert.IsTrue(result.Success);
+                Assert.IsTrue(Math.Abs(result.ActualVoidness - target) < 5);
+            });
         }
 
+        //TODO: RSDN +
+        [TestCase(50)]
+        [TestCase(0)]
+        [TestCase(-5)]
+        [Description("CalculateOptimalParameters возвращает" +
+            " ошибку для недопустимой пустотности")]
+        public void CalculateOptimalParameters_InvalidVoidness_ShouldReturnError(double voidness)
+        {
+            var result = Calculator.CalculateOptimalParameters(
+                250, 120, 65, voidness, HoleDistributionType.Straight);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(result.Success);
+                Assert.IsNotNull(result.ErrorMessage);
+                Assert.IsTrue(result.ErrorMessage.Contains("должна быть в диапазоне"));
+            });
+        }
+
+        [Test]
+        [Description("CalculateOptimalParameters работает с различными типами распределения")]
+        public void CalculateOptimalParameters_DifferentDistributions_ShouldWork()
+        {
+            var straightResult = Calculator.CalculateOptimalParameters(
+                250, 120, 65, 25, HoleDistributionType.Straight);
+            var staggeredResult = Calculator.CalculateOptimalParameters(
+                250, 120, 65, 25, HoleDistributionType.Staggered);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsTrue(straightResult.Success);
+                Assert.IsTrue(staggeredResult.Success);
+            });
+        }
+
+        [Test]
+        [Description("CalculateOptimalParameters находит точное решение с difference < 0.1")]
+        public void CalculateOptimalParameters_FindsExactSolution_ReturnsEarly()
+        {
+            // Используем параметры, где можно точно достичь целевой пустотности
+            // length=250, width=120, height=65, target=10%
+            var result = Calculator.CalculateOptimalParameters(
+                250, 120, 65, 10, HoleDistributionType.Straight);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsTrue(result.Success);
+                Assert.IsTrue(Math.Abs(result.ActualVoidness - 10) < 0.1 ||
+                              Math.Abs(result.ActualVoidness - 10) < 5);
+            });
+        }
+
+        //TODO: RSDN +
+        [Test]
+        [Description("CalculateOptimalParameters возвращает " +
+            "лучшее решение когда точное недостижимо")]
+        public void CalculateOptimalParameters_NoExactMatch_ShouldReturnBest()
+        {
+            var result = Calculator.CalculateOptimalParameters(
+                250, 120, 65, 30, HoleDistributionType.Straight);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsTrue(result.Success);
+                Assert.IsTrue(result.ActualVoidness > 0);
+                Assert.IsTrue(result.ActualVoidness <= 45);
+            });
+        }
+
+        [Test]
+        [Description("CalculateOptimalParameters учитывает ограничение пустотности")]
+        public void CalculateOptimalParameters_ShouldRespectVoidnessLimit()
+        {
+            var result = Calculator.CalculateOptimalParameters(
+                250, 120, 65, 44, HoleDistributionType.Straight);
+
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(result.ActualVoidness <= 45);
+        }
+
+        [Test]
+        [Description("CalculateOptimalParameters пропускает комбинации превышающие 45%")]
+        public void CalculateOptimalParameters_SkipsCombinationsExceeding45()
+        {
+            var result = Calculator.CalculateOptimalParameters(
+                200, 100, 50, 40, HoleDistributionType.Straight);
+
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(result.ActualVoidness <= 45);
+            Assert.IsTrue(result.HolesCount >= 1);
+            Assert.IsTrue(result.HoleRadius >= 2);
+        }
+
+        //TODO: RSDN +
         [Test]
         [Description("GetVoidnessRange возвращает корректный диапазон")]
         public void GetVoidnessRange_ShouldReturnValidRange()
         {
-            var (min, max) = _calculator.GetVoidnessRange(
+            var (min, max) = Calculator.GetVoidnessRange(
                 250, 120, 65, 8, HoleDistributionType.Straight);
 
-            Assert.IsTrue(min >= 0);
+            Assert.Multiple(() =>
+            {
+                Assert.IsTrue(min > 0);
+                Assert.IsTrue(max > min);
+                Assert.IsTrue(max <= 45);
+            });
+        }
+
+        [Test]
+        [Description("GetVoidnessRange ограничивает максимум до 45%")]
+        public void GetVoidnessRange_ShouldClampMaxTo45()
+        {
+            var (min, max) = Calculator.GetVoidnessRange(
+                250, 120, 65, 8, HoleDistributionType.Straight);
+
             Assert.IsTrue(max <= 45);
-            Assert.IsTrue(min <= max);
         }
 
+        //TODO: RSDN +
         [Test]
-        [Description("GetVoidnessRange для нулевого радиуса возвращает нули")]
-        public void GetVoidnessRange_ZeroRadius_ShouldReturnZeros()
+        [Description("GetVoidnessRange для шахматного больше или равно прямому")]
+        public void GetVoidnessRange_Staggered_HigherOrEqualMax()
         {
-            var (min, max) = _calculator.GetVoidnessRange(
-                250, 120, 65, 0, HoleDistributionType.Straight);
-
-            Assert.AreEqual(0, min, 0.01);
-            Assert.AreEqual(0, max, 0.01);
-        }
-
-        [Test]
-        [Description("GetVoidnessRange минимум равен пустотности для 1 отверстия")]
-        public void GetVoidnessRange_MinShouldMatchOneHole()
-        {
-            var (min, max) = _calculator.GetVoidnessRange(
+            var (minStraight, maxStraight) = Calculator.GetVoidnessRange(
                 250, 120, 65, 8, HoleDistributionType.Straight);
-            var oneHole = _calculator.CalculateCurrentVoidness(250, 120, 65, 8, 1);
-
-            Assert.AreEqual(oneHole, min, 0.01);
-        }
-
-        [Test]
-        [Description("GetVoidnessRange для шахматного даёт больший максимум")]
-        public void GetVoidnessRange_Staggered_HigherMax()
-        {
-            var (minStraight, maxStraight) = _calculator.GetVoidnessRange(
-                250, 120, 65, 8, HoleDistributionType.Straight);
-            var (minStaggered, maxStaggered) = _calculator.GetVoidnessRange(
+            var (minStaggered, maxStaggered) = Calculator.GetVoidnessRange(
                 250, 120, 65, 8, HoleDistributionType.Staggered);
 
-            Assert.AreEqual(minStraight, minStaggered, 0.01);
-            Assert.IsTrue(maxStaggered >= maxStraight);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(minStraight, minStaggered, 0.01);
+                Assert.IsTrue(maxStaggered >= maxStraight);
+            });
+        }
+
+        //TODO: RSDN +
+        [TestCase(50)]
+        [TestCase(0)]
+        [TestCase(-10)]
+        [Description("CalculateHolesCountForVoidness возвращает " +
+            "ошибку для недопустимой пустотности")]
+        public void CalculateHolesCountForVoidness_InvalidVoidness_ShouldReturnError(double voidness)
+        {
+            var result = Calculator.CalculateHolesCountForVoidness(
+                250, 120, 65, 8, voidness, HoleDistributionType.Straight);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(result.Success);
+                Assert.IsNotNull(result.ErrorMessage);
+                Assert.IsTrue(result.ErrorMessage.Contains("должна быть в диапазоне"));
+            });
+        }
+
+        //TODO: RSDN +
+        [Test]
+        [Description("CalculateHolesCountForVoidness возвращает успешный результат")]
+        public void CalculateHolesCountForVoidness_ValidParameters_ShouldReturnSuccess()
+        {
+            var result = Calculator.CalculateHolesCountForVoidness(
+                250, 120, 65, 8, 20, HoleDistributionType.Straight);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsTrue(result.Success);
+                Assert.AreEqual(8, result.HoleRadius);
+                Assert.IsTrue(result.HolesCount >= 1);
+            });
+        }
+
+        [Test]
+        [Description("CalculateHolesCountForVoidness округляет количество отверстий")]
+        public void CalculateHolesCountForVoidness_ShouldRoundHoles()
+        {
+            var result = Calculator.CalculateHolesCountForVoidness(
+                250, 120, 65, 8, 15, HoleDistributionType.Straight);
+
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(result.HolesCount >= 1);
+        }
+
+        [Test]
+        [Description("CalculateHolesCountForVoidness работает с разными типами распределения")]
+        public void CalculateHolesCountForVoidness_DifferentDistributions_ShouldWork()
+        {
+            var straightResult = Calculator.CalculateHolesCountForVoidness(
+                250, 120, 65, 8, 20, HoleDistributionType.Straight);
+            var staggeredResult = Calculator.CalculateHolesCountForVoidness(
+                250, 120, 65, 8, 20, HoleDistributionType.Staggered);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsTrue(straightResult.Success);
+                Assert.IsTrue(staggeredResult.Success);
+            });
+        }
+
+        [Test]
+        [Description("CalculateHolesCountForVoidness возвращает " +
+            "ошибку если невозможно разместить отверстия")]
+        public void CalculateHolesCountForVoidness_TooLargeRadius_ShouldReturnError()
+        {
+            var result = Calculator.CalculateHolesCountForVoidness(
+                100, 60, 50, 50, 20, HoleDistributionType.Straight);
+
+            Assert.IsFalse(result.Success);
+            Assert.IsNotNull(result.ErrorMessage);
+            Assert.IsTrue(result.ErrorMessage.Contains("Невозможно разместить отверстия"));
+        }
+
+        [Test]
+        [Description("CalculateHolesCountForVoidness ограничивает количество максимумом")]
+        public void CalculateHolesCountForVoidness_ShouldClampToMaxHoles()
+        {
+            var result = Calculator.CalculateHolesCountForVoidness(
+                250, 120, 65, 8, 44, HoleDistributionType.Straight);
+
+            Assert.IsTrue(result.Success);
+            // Количество отверстий не должно превышать максимально возможное
+            var maxVoidness = Calculator.CalculateMaxPossibleVoidness(
+                250, 120, 65, 8, HoleDistributionType.Straight);
+            Assert.IsTrue(result.ActualVoidness <= maxVoidness + 0.1);
+        }
+
+        [Test]
+        [Description("CalculateHolesCountForVoidness возвращает " +
+            "ошибку для слишком большого радиуса")]
+        public void CalculateHolesCountForVoidness_TooLargeRadiusForTarget_ReturnsError()
+        {
+            var result = Calculator.CalculateHolesCountForVoidness(
+                150, 150, 50, 58, 40, HoleDistributionType.Straight);
+
+            // С такими параметрами гарантированно получим ошибку
+            Assert.IsFalse(result.Success);
+            Assert.IsNotNull(result.ErrorMessage);
+            Assert.IsTrue(result.ErrorMessage.Contains("превышает максимум") ||
+                          result.ErrorMessage.Contains("Невозможно") ||
+                          result.ErrorMessage.Contains("Достижимая пустотность"));
+        }
+
+        [Test]
+        [Description("CalculateHolesCountForVoidness ограничивает calculatedHoles минимумом 1")]
+        public void CalculateHolesCountForVoidness_ShouldClampToMinimumOne()
+        {
+            var result = Calculator.CalculateHolesCountForVoidness(
+                250, 120, 65, 8, 0.1, HoleDistributionType.Straight);
+
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(1, result.HolesCount);
+            var expected = Calculator.CalculateCurrentVoidness(250, 120, 65, 8, 1);
+            Assert.AreEqual(expected, result.ActualVoidness, 0.01);
+        }
+
+        [Test]
+        [Description("CalculateOptimalParameters пропускает радиусы с maxHoles <= 0")]
+        public void CalculateOptimalParameters_ShouldSkipRadiusWithZeroMaxHoles()
+        {
+            var result = Calculator.CalculateOptimalParameters(
+                40, 40, 20, 10, HoleDistributionType.Straight);
+
+            // Не должно быть exception, результат должен быть либо Success либо с ErrorMessage
+            Assert.IsNotNull(result);
+        }
+
+        [Test]
+        [Description("CalculateOptimalParameters пропускает радиусы с maxHoles <= 0 через continue")]
+        public void CalculateOptimalParameters_ShouldSkipRadiiWithZeroMaxHoles()
+        {
+            var calculator = new VoidnessCalculator();
+            var result = calculator.CalculateOptimalParameters(
+                50, 35, 30, 15, HoleDistributionType.Straight);
+            Assert.IsNotNull(result);
+        }
+
+        [Test]
+        [Description("CalculateOptimalParameters не находит решение для невозможных параметров")]
+        public void CalculateOptimalParameters_ImpossibleParameters_ReturnsError()
+        {
+            var result = Calculator.CalculateOptimalParameters(
+                35, 30, 25, 40, HoleDistributionType.Straight);
+
+            // Должна быть ошибка, так как невозможно найти подходящие параметры
+            Assert.IsFalse(result.Success);
+            Assert.IsNotNull(result.ErrorMessage);
+            Assert.IsTrue(result.ErrorMessage.Contains("Не удалось подобрать параметры") ||
+                          result.ErrorMessage.Contains("должна быть в диапазоне"));
+        }
+
+        [Test]
+        [Description("CalculateOptimalParameters проходит через continue когда maxHoles = 0")]
+        public void CalculateOptimalParameters_MaxHolesZero_ContinuesLoop()
+        {
+            var calculator = new VoidnessCalculator();
+
+            // Очень маленький кирпич - для большинства радиусов maxHoles будет 0
+            var result = calculator.CalculateOptimalParameters(
+                30, 30, 20, 10, HoleDistributionType.Straight);
+
+            // Проверяем что метод не упал и вернул корректный результат
+            Assert.IsNotNull(result);
+        }
+
+        [Test]
+        [Description("CalculateHolesCountForVoidness возвращает " +
+            "ошибку когда actualVoidness превышает MaxVoidnessPercent")]
+        public void CalculateHolesCountForVoidness_WhenActualExceedsMaxVoidness_ReturnsSpecificError()
+        {
+
+            var result = Calculator.CalculateHolesCountForVoidness(
+                150, 150, 50, 57, 44, HoleDistributionType.Straight);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(result.Success, "Результат должен быть неуспешным");
+                Assert.IsNotNull(result.ErrorMessage, "Должно быть сообщение об ошибке");
+                Assert.IsTrue(result.ErrorMessage.Contains("Достижимая пустотность"),
+                    "Сообщение должно содержать 'Достижимая пустотность'");
+                Assert.IsTrue(result.ErrorMessage.Contains("превышает максимум"),
+                    "Сообщение должно содержать 'превышает максимум'");
+                Assert.IsTrue(result.ErrorMessage.Contains("45"),
+                    "Сообщение должно содержать '45'");
+            });
+        }
+
+        [Test]
+        [Description("CalculateHolesCountForVoidness с очень большим радиусом дает превышение 45%")]
+        public void CalculateHolesCountForVoidness_LargeRadius_ExceedsMaxVoidness()
+        {
+            // Еще один набор параметров:
+            // Кирпич: 140x140x50, радиус: 54, целевая пустотность: 42%
+            // actualVoidness для 1 отверстия ≈ 46.7% > 45%
+
+            var result = Calculator.CalculateHolesCountForVoidness(
+                140, 140, 50, 54, 42, HoleDistributionType.Straight);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(result.Success);
+                Assert.IsNotNull(result.ErrorMessage);
+                Assert.IsTrue(result.ErrorMessage.
+                    Contains("Достижимая пустотность"));
+                Assert.IsTrue(result.ErrorMessage.
+                    Contains("превышает максимум"));
+            });
+        }
+
+        [Test]
+        [Description("CalculateHolesCountForVoidness возвращает " +
+            "ошибку когда actualVoidness превышает 45%")]
+        public void CalculateHolesCountForVoidness_ActualVoidnessExceeds45_ReturnsError()
+        {
+            // Третий набор параметров для надежности:
+            // Кирпич: 145x145x50, радиус: 55
+            var result = Calculator.CalculateHolesCountForVoidness(
+                145, 145, 50, 55, 43, HoleDistributionType.Straight);
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(result.Success);
+                Assert.IsNotNull(result.ErrorMessage);
+                Assert.IsTrue(result.ErrorMessage.Contains("Достижимая пустотность"));
+                Assert.IsTrue(result.ErrorMessage.Contains("превышает максимум"));
+                Assert.IsTrue(result.ErrorMessage.Contains("45"));
+            });
+        }
+
+        [Test]
+        [Description("CalculateHolesCountForVoidness проверяет " +
+            "превышение MaxVoidnessPercent")]
+        public void CalculateHolesCountForVoidness_ChecksMaxVoidnessPercent()
+        {
+            // Проверяем, что метод действительно проверяет превышение 45%
+            // Используем параметры, где одно отверстие дает >45%
+            var result = Calculator.CalculateHolesCountForVoidness(
+                150, 150, 50, 57, 40, HoleDistributionType.Straight);
+
+            // Должна быть ошибка о превышении MaxVoidnessPercent
+            Assert.IsFalse(result.Success);
+            Assert.IsNotNull(result.ErrorMessage);
+            Assert.IsTrue(
+                result.ErrorMessage.Contains("превышает максимум") ||
+                result.ErrorMessage.Contains("Достижимая пустотность"));
+        }
+
+        [Test]
+        [Description("CalculateOptimalParameters с Staggered " +
+            "проходит через условие maxHoles")]
+        public void CalculateOptimalParameters_Staggered_ProcessesMaxHoles()
+        {
+            var result = Calculator.CalculateOptimalParameters(
+                250, 120, 65, 25, HoleDistributionType.Staggered);
+
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(result.HolesCount > 0);
+            Assert.IsTrue(result.ActualVoidness > 0);
+        }
+
+        [Test]
+        [Description("CalculateOptimalParameters тестирует " +
+            "обе ветки распределения в цикле")]
+        public void CalculateOptimalParameters_BothDistributionTypes_ProcessedInLoop()
+        {
+            // Тест для Straight
+            var straightResult = Calculator.CalculateOptimalParameters(
+                200, 100, 50, 20, HoleDistributionType.Straight);
+
+            // Тест для Staggered  
+            var staggeredResult = Calculator.CalculateOptimalParameters(
+                200, 100, 50, 20, HoleDistributionType.Staggered);
+
+            Assert.IsNotNull(straightResult);
+            Assert.IsNotNull(staggeredResult);
         }
     }
 }

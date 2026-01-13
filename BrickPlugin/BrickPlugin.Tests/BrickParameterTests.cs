@@ -61,7 +61,8 @@ namespace BrickPlugin.Tests
         }
 
         [Test]
-        [Description("IsValid возвращает false для значения меньше минимального")]
+        [Description("IsValid возвращает false" +
+            " для значения меньше минимального")]
         public void IsValid_WhenValueBelowMin_ShouldReturnFalse()
         {
             var parameter = new BrickParameter(10, 100, 5);
@@ -70,7 +71,8 @@ namespace BrickPlugin.Tests
         }
 
         [Test]
-        [Description("IsValid возвращает false для значения больше максимального")]
+        [Description("IsValid возвращает false " +
+            "для значения больше максимального")]
         public void IsValid_WhenValueAboveMax_ShouldReturnFalse()
         {
             var parameter = new BrickParameter(10, 100, 150);
@@ -79,7 +81,8 @@ namespace BrickPlugin.Tests
         }
 
         [Test]
-        [Description("IsValid возвращает true для значения равного минимальному")]
+        [Description("IsValid возвращает true " +
+            "для значения равного минимальному")]
         public void IsValid_WhenValueEqualsMin_ShouldReturnTrue()
         {
             var parameter = new BrickParameter(10, 100, 10);
@@ -88,7 +91,8 @@ namespace BrickPlugin.Tests
         }
 
         [Test]
-        [Description("IsValid возвращает true для значения равного максимальному")]
+        [Description("IsValid возвращает true " +
+            "для значения равного максимальному")]
         public void IsValid_WhenValueEqualsMax_ShouldReturnTrue()
         {
             var parameter = new BrickParameter(10, 100, 100);

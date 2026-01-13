@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrickPluginUI", "BrickPlugi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrickPluginModels", "BrickPluginModels\BrickPluginModels.csproj", "{58139349-B40D-4CF1-8866-8333898F4C4E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StressTesting", "StressTesting\StressTesting.csproj", "{341B1B0F-6FD5-46F9-B252-7A8BEA83CC6E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{58139349-B40D-4CF1-8866-8333898F4C4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58139349-B40D-4CF1-8866-8333898F4C4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58139349-B40D-4CF1-8866-8333898F4C4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{341B1B0F-6FD5-46F9-B252-7A8BEA83CC6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{341B1B0F-6FD5-46F9-B252-7A8BEA83CC6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{341B1B0F-6FD5-46F9-B252-7A8BEA83CC6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{341B1B0F-6FD5-46F9-B252-7A8BEA83CC6E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
