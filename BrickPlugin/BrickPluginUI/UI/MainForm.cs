@@ -124,7 +124,8 @@ namespace BrickPluginUI
         {
             if (sender is RadioButton radioButton && radioButton.Checked)
             {
-                HoleDistributionType distributionType = radioButton == radioButton_Straight
+                HoleDistributionType distributionType 
+                    = radioButton == radioButton_Straight
                     ? HoleDistributionType.Straight
                     : HoleDistributionType.Staggered;
 

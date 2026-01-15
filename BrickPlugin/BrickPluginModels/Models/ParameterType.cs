@@ -1,6 +1,5 @@
 ﻿namespace BrickPluginModels.Models
 {
-    //TODO: RSDN
     /// <summary>
     /// Определяет типы параметров кирпича.
     /// </summary>

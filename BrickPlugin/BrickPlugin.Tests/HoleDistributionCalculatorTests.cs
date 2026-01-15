@@ -10,7 +10,6 @@ namespace BrickPlugin.Tests
     {
         private HoleDistributionCalculator Calculator => new HoleDistributionCalculator();
 
-        //TODO: RSDN +
         [Test]
         [Description("CalculateMaxHolesStraight возвращает положительное значение")]
         public void CalculateMaxHolesStraight_ShouldReturnPositiveValue()
@@ -20,7 +19,6 @@ namespace BrickPlugin.Tests
             Assert.IsTrue(maxHoles > 0);
         }
 
-        //TODO: RSDN +
         [TestCase(250, 120, 100, 0)]
         [TestCase(10, 120, 20, 0)]
         [TestCase(250, 10, 20, 0)]
@@ -63,7 +61,6 @@ namespace BrickPlugin.Tests
             Assert.IsTrue(maxHoles >= 1);
         }
 
-        //TODO: RSDN +
         [Test]
         [Description("CalculateMaxHolesStaggered возвращает положительное значение")]
         public void CalculateMaxHolesStaggered_ShouldReturnPositiveValue()
@@ -73,7 +70,6 @@ namespace BrickPlugin.Tests
             Assert.IsTrue(maxHoles > 0);
         }
 
-        //TODO: RSDN +
         [TestCase(250, 120, 100, 0)]
         [TestCase(10, 120, 20, 0)]
         [TestCase(250, 10, 20, 0)]
@@ -86,7 +82,6 @@ namespace BrickPlugin.Tests
             Assert.AreEqual(expected, maxHoles);
         }
 
-        //TODO: RSDN +
         [Test]
         [Description("CalculateMaxHolesStaggered обычно больше чем прямое")]
         public void CalculateMaxHolesStaggered_ShouldBeMoreThanStraight()
@@ -107,7 +102,6 @@ namespace BrickPlugin.Tests
             Assert.IsTrue(maxHoles >= 1);
         }
 
-        //TODO: RSDN +
         [Test]
         [Description("CalculateStraightDistribution для 1 отверстия возвращает 1 ряд")]
         public void CalculateStraightDistribution_OneHole_ShouldReturnOneRow()
@@ -123,7 +117,6 @@ namespace BrickPlugin.Tests
             });
         }
 
-        //TODO: RSDN +
         [Test]
         [Description("CalculateStraightDistribution корректно распределяет отверстия")]
         public void CalculateStraightDistribution_ShouldDistributeCorrectly()
@@ -138,7 +131,6 @@ namespace BrickPlugin.Tests
             });
         }
 
-        //TODO: RSDN +
         [Test]
         [Description("CalculateStraightDistribution устанавливает положительные зазоры")]
         public void CalculateStraightDistribution_ShouldSetPositiveGaps()
@@ -152,7 +144,6 @@ namespace BrickPlugin.Tests
             });
         }
 
-        //TODO: RSDN +
         [Test]
         [Description("CalculateStraightDistribution равномерно распределяет по рядам")]
         public void CalculateStraightDistribution_ShouldDistributeEvenly()
@@ -200,7 +191,6 @@ namespace BrickPlugin.Tests
             Assert.IsTrue(result.Rows >= 1);
         }
 
-        //TODO: RSDN +
         [Test]
         [Description("CalculateStaggeredDistribution корректно распределяет отверстия")]
         public void CalculateStaggeredDistribution_ShouldDistributeCorrectly()
@@ -214,7 +204,6 @@ namespace BrickPlugin.Tests
             });
         }
 
-        //TODO: RSDN +
         [Test]
         [Description("CalculateStaggeredDistribution устанавливает ненулевое смещение")]
         public void CalculateStaggeredDistribution_ShouldSetNonZeroOffset()
@@ -224,7 +213,6 @@ namespace BrickPlugin.Tests
             Assert.IsTrue(result.StaggerOffset > 0);
         }
 
-        //TODO: RSDN +
         [Test]
         [Description("CalculateStaggeredDistribution устанавливает положительные зазоры")]
         public void CalculateStaggeredDistribution_ShouldSetPositiveGaps()
@@ -238,7 +226,6 @@ namespace BrickPlugin.Tests
             });
         }
 
-        //TODO: RSDN +
         [Test]
         [Description("CalculateStaggeredDistribution использует минимум 2 ряда")]
         public void CalculateStaggeredDistribution_ShouldUseAtLeastTwoRows()
@@ -262,7 +249,6 @@ namespace BrickPlugin.Tests
             });
         }
 
-        //TODO: RSDN +
         [Test]
         [Description("MaxHoles и Distribution согласованы для прямого")]
         public void MaxHolesStraight_AndDistribution_ShouldBeConsistent()
@@ -273,7 +259,6 @@ namespace BrickPlugin.Tests
             Assert.AreEqual(maxHoles, distribution.Distribution.Sum());
         }
 
-        //TODO: RSDN +
         [Test]
         [Description("MaxHoles и Distribution согласованы для шахматного")]
         public void MaxHolesStaggered_AndDistribution_ShouldBeConsistent()

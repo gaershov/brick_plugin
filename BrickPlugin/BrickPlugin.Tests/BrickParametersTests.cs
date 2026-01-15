@@ -416,6 +416,8 @@ namespace BrickPlugin.Tests
             "отверстий для прямого распределения")]
         public void Validate_ExceedsMaxHolesStraight_ReturnsError()
         {
+            //TODO: duplicatoin
+
             var parameters = new BrickParameters();
             parameters.DistributionType = HoleDistributionType.Straight;
             parameters[ParameterType.HoleRadius] = 5;
@@ -443,6 +445,7 @@ namespace BrickPlugin.Tests
             "максимума отверстий для шахматного распределения")]
         public void Validate_ExceedsMaxHolesStaggered_ReturnsError()
         {
+            //TODO: duplicatoin
             var parameters = new BrickParameters();
             parameters.DistributionType = HoleDistributionType.Staggered;
             parameters[ParameterType.HoleRadius] = 5;
