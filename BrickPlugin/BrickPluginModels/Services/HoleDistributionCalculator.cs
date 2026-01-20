@@ -40,30 +40,17 @@ namespace BrickPluginModels.Services
             return Math.Max(1, columns) * Math.Max(1, rows);
         }
 
+        //TODO duplication +
         /// <summary>
-        /// Рассчитывает максимальное количество отверстий для шахматного распределения.
+        /// Рассчитывает общую вместимость отверстий для шахматного распределения.
         /// </summary>
-        /// <param name="length">Длина кирпича в миллиметрах.</param>
-        /// <param name="width">Ширина кирпича в миллиметрах.</param>
-        /// <param name="holeRadius">Радиус отверстия в миллиметрах.</param>
-        /// <returns>Максимальное количество отверстий.</returns>
-        public int CalculateMaxHolesStaggered(double length, double width, double holeRadius)
+        private int CalculateStaggeredCapacity(
+            int rows,
+            (double diameter, double edgeMargin, double minGap,
+             double availableLength, double availableWidth) availableArea)
         {
-            var availableArea 
-                = BrickParameters.CalculateAvailableArea(length, width, holeRadius);
-
-            if (availableArea.availableLength <= 0 || availableArea.availableWidth <= 0)
-            {
-                return 0;
-            }
-
-            //TODO: duplication
             double horizontalStep = availableArea.diameter + availableArea.minGap;
-            double verticalStep = availableArea.diameter + availableArea.minGap;
             double staggerOffset = horizontalStep / 2.0;
-
-            int maxRows = Math.Max(1,
-                (int)Math.Floor(availableArea.availableWidth / verticalStep) + 1);
 
             int columnsInEvenRows = Math.Max(1,
                 (int)Math.Floor((availableArea.availableLength + availableArea.minGap)
@@ -73,20 +60,48 @@ namespace BrickPluginModels.Services
                 (int)Math.Floor((availableArea.availableLength -
                 staggerOffset + availableArea.minGap) / horizontalStep));
 
-            int evenRowsCount = (maxRows + 1) / 2;
-            int oddRowsCount = maxRows / 2;
+            int evenRowsCount = (rows + 1) / 2;
+            int oddRowsCount = rows / 2;
 
             return evenRowsCount * columnsInEvenRows + oddRowsCount * columnsInOddRows;
+        }
+
+        //TODO duplication +
+        /// <summary>
+        /// Рассчитывает максимальное количество отверстий для шахматного распределения.
+        /// </summary>
+        public int CalculateMaxHolesStaggered(double length, double width, double holeRadius)
+        {
+            var availableArea = BrickParameters.CalculateAvailableArea(length, width, holeRadius);
+
+            if (availableArea.availableLength <= 0 || availableArea.availableWidth <= 0)
+            {
+                return 0;
+            }
+
+            double verticalStep = availableArea.diameter + availableArea.minGap;
+            int maxRows = Math.Max(1,
+                (int)Math.Floor(availableArea.availableWidth / verticalStep) + 1);
+
+            return CalculateStaggeredCapacity(maxRows, availableArea);
+        }
+
+        //TODO duplication +
+        /// <summary>
+        /// Проверяет, может ли заданное количество отверстий
+        /// поместиться в указанное количество рядов.
+        /// </summary>
+        private bool CanFitHoles(int totalHoles, int rows,
+            (double diameter, double edgeMargin, double minGap,
+            double availableLength, double availableWidth) availableArea)
+        {
+            int totalCapacity = CalculateStaggeredCapacity(rows, availableArea);
+            return totalCapacity >= totalHoles;
         }
 
         /// <summary>
         /// Вычисляет распределение отверстий для прямого размещения (без смещения).
         /// </summary>
-        /// <param name="totalHoles">Общее количество отверстий.</param>
-        /// <param name="length">Длина кирпича в миллиметрах.</param>
-        /// <param name="width">Ширина кирпича в миллиметрах.</param>
-        /// <param name="holeRadius">Радиус отверстия в миллиметрах.</param>
-        /// <returns>Результат распределения отверстий по рядам.</returns>
         public HoleDistributionResult CalculateStraightDistribution(
             int totalHoles, double length, double width, double holeRadius)
         {
@@ -102,12 +117,12 @@ namespace BrickPluginModels.Services
                 return result;
             }
 
-            int maxHolesPerRow = Math.Max(1,
-                (int)Math.Floor((availableArea.availableLength + availableArea.minGap) /
-                                (availableArea.diameter + availableArea.minGap)));
+            double step = availableArea.diameter + availableArea.minGap;
 
-            int rowsCount = (int)Math.Ceiling((double)totalHoles / maxHolesPerRow);
-            rowsCount = Math.Max(1, rowsCount);
+            int maxHolesPerRow = Math.Max(1,
+                (int)Math.Floor((availableArea.availableLength + availableArea.minGap) / step));
+
+            int rowsCount = Math.Max(1, (int)Math.Ceiling((double)totalHoles / maxHolesPerRow));
 
             result.Rows = rowsCount;
             result.Distribution = DistributeEvenly(totalHoles, rowsCount);
@@ -131,11 +146,6 @@ namespace BrickPluginModels.Services
         /// <summary>
         /// Вычисляет распределение отверстий для шахматного размещения (со смещением).
         /// </summary>
-        /// <param name="totalHoles">Общее количество отверстий.</param>
-        /// <param name="length">Длина кирпича в миллиметрах.</param>
-        /// <param name="width">Ширина кирпича в миллиметрах.</param>
-        /// <param name="holeRadius">Радиус отверстия в миллиметрах.</param>
-        /// <returns>Результат распределения отверстий по рядам с параметрами смещения.</returns>
         public HoleDistributionResult CalculateStaggeredDistribution(
             int totalHoles, double length, double width, double holeRadius)
         {
@@ -143,12 +153,11 @@ namespace BrickPluginModels.Services
             var availableArea =
                 BrickParameters.CalculateAvailableArea(length, width, holeRadius);
 
-            double horizontalStep = availableArea.diameter + availableArea.minGap;
-            double verticalStep = availableArea.diameter + availableArea.minGap;
-            double staggerOffset = horizontalStep / 2.0;
+            double step = availableArea.diameter + availableArea.minGap;
+            double staggerOffset = step / 2.0;
 
             int maxPossibleRows = Math.Max(3,
-                (int)Math.Floor(availableArea.availableWidth / verticalStep) + 1);
+                (int)Math.Floor(availableArea.availableWidth / step) + 1);
 
             int optimalRowsCount = FindOptimalRowsCount(
                 totalHoles, maxPossibleRows, availableArea);
@@ -157,7 +166,7 @@ namespace BrickPluginModels.Services
             result.Distribution = DistributeAlternating(totalHoles, optimalRowsCount);
             result.MaxHolesInRow = result.Distribution.Max();
             result.HorizontalGap = availableArea.minGap;
-            result.VerticalGap = verticalStep;
+            result.VerticalGap = step;
             result.StaggerOffset = staggerOffset;
 
             return result;
@@ -189,41 +198,6 @@ namespace BrickPluginModels.Services
             }
 
             return maxRows;
-        }
-
-        /// <summary>
-        /// Проверяет, может ли заданное количество отверстий
-        /// поместиться в указанное количество рядов.
-        /// </summary>
-        /// <param name="totalHoles">Общее количество отверстий.</param>
-        /// <param name="rows">Количество рядов.</param>
-        /// <param name="availableArea">Параметры доступной области для размещения.</param>
-        /// <returns>True, если отверстия помещаются; иначе False.</returns>
-        private bool CanFitHoles(
-            int totalHoles,
-            int rows,
-            (double diameter, double edgeMargin, double minGap,
-             double availableLength, double availableWidth) availableArea)
-        {
-            double horizontalStep = availableArea.diameter + availableArea.minGap;
-            double staggerOffset = horizontalStep / 2.0;
-
-            //TODO duplication
-            int columnsInEvenRows = Math.Max(1,
-                (int)Math.Floor((availableArea.availableLength +
-                availableArea.minGap) / horizontalStep));
-
-            int columnsInOddRows = Math.Max(1,
-                (int)Math.Floor((availableArea.availableLength -
-                staggerOffset + availableArea.minGap) / horizontalStep));
-
-            int evenRowsCount = (rows + 1) / 2;
-            int oddRowsCount = rows / 2;
-
-            int totalCapacity = evenRowsCount * columnsInEvenRows +
-                oddRowsCount * columnsInOddRows;
-
-            return totalCapacity >= totalHoles;
         }
 
         /// <summary>

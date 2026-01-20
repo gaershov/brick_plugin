@@ -411,51 +411,26 @@ namespace BrickPlugin.Tests
             Assert.IsTrue(eventRaised);
         }
 
-        [Test]
-        [Description("ValidateBusinessRules проверяет превышение максимума " +
-            "отверстий для прямого распределения")]
-        public void Validate_ExceedsMaxHolesStraight_ReturnsError()
-        {
-            //TODO: duplicatoin
-
-            var parameters = new BrickParameters();
-            parameters.DistributionType = HoleDistributionType.Straight;
-            parameters[ParameterType.HoleRadius] = 5;
-            parameters[ParameterType.HolesCount] = 10; // Сначала валидное значение
-
-            string errorText = "";
-            parameters.ErrorMessage += (sender, message) => errorText = message;
-
-            // Получаем реальный максимум и превышаем его
-            var maxHoles = parameters.GetParameter(ParameterType.HolesCount).MaxValue;
-            parameters[ParameterType.HolesCount] = maxHoles + 10;
-
-            var result = parameters.Validate();
-
-            Assert.Multiple(() =>
-            {
-                Assert.IsFalse(result);
-                Assert.IsTrue(errorText.Contains("превышает возможное для"));
-                Assert.IsTrue(errorText.Contains("прямого распределения"));
-            });
-        }
-
-        [Test]
+        //TODO: duplicatoin +
+        [TestCase(HoleDistributionType.Straight, "прямого распределения")]
+        [TestCase(HoleDistributionType.Staggered, "шахматного распределения")]
         [Description("ValidateBusinessRules проверяет превышение " +
-            "максимума отверстий для шахматного распределения")]
-        public void Validate_ExceedsMaxHolesStaggered_ReturnsError()
+            "максимума отверстий")]
+        public void Validate_ExceedsMaxHoles_ReturnsError(
+            HoleDistributionType distributionType,
+            string expectedDistributionText)
         {
-            //TODO: duplicatoin
             var parameters = new BrickParameters();
-            parameters.DistributionType = HoleDistributionType.Staggered;
+            parameters.DistributionType = distributionType;
             parameters[ParameterType.HoleRadius] = 5;
-            parameters[ParameterType.HolesCount] = 10; // Сначала валидное значение
+            parameters[ParameterType.HolesCount] = 10;
 
             string errorText = "";
             parameters.ErrorMessage += (sender, message) => errorText = message;
 
             // Получаем реальный максимум и превышаем его
-            var maxHoles = parameters.GetParameter(ParameterType.HolesCount).MaxValue;
+            var maxHoles 
+                = parameters.GetParameter(ParameterType.HolesCount).MaxValue;
             parameters[ParameterType.HolesCount] = maxHoles + 10;
 
             var result = parameters.Validate();
@@ -464,7 +439,7 @@ namespace BrickPlugin.Tests
             {
                 Assert.IsFalse(result);
                 Assert.IsTrue(errorText.Contains("превышает возможное для"));
-                Assert.IsTrue(errorText.Contains("шахматного распределения"));
+                Assert.IsTrue(errorText.Contains(expectedDistributionText));
             });
         }
 
@@ -552,7 +527,8 @@ namespace BrickPlugin.Tests
         }
 
         [Test]
-        [Description("Validate использует GetParameterDisplayName для всех типов параметров")]
+        [Description("Validate использует GetParameterDisplayName " +
+            "для всех типов параметров")]
         public void Validate_UsesGetParameterDisplayName_ForAllParameterTypes()
         {
             var parameters = new BrickParameters();

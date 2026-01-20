@@ -395,7 +395,7 @@ namespace BrickPlugin.Tests
             Assert.Multiple(() =>
             {
                 Assert.AreEqual(55, result.Distribution.Sum());
-                Assert.IsTrue(result.Rows >= 2); // Изменено на >= 2 вместо >= 4
+                Assert.IsTrue(result.Rows >= 2); 
                 var maxInRow = result.Distribution.Max();
                 var minInRow = result.Distribution.Min();
                 Assert.IsTrue(maxInRow - minInRow <= 1);
@@ -429,7 +429,6 @@ namespace BrickPlugin.Tests
                 var maxInRow = result.Distribution.Max();
                 var minInRow = result.Distribution.Min();
                 Assert.IsTrue(maxInRow - minInRow <= 1);
-                // Проверяем что распределение действительно произошло
                 Assert.IsTrue(result.Distribution.Count(x => x == maxInRow) > 0);
             });
         }
