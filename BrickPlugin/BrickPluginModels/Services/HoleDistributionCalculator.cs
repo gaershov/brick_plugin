@@ -40,7 +40,6 @@ namespace BrickPluginModels.Services
             return Math.Max(1, columns) * Math.Max(1, rows);
         }
 
-        //TODO duplication +
         /// <summary>
         /// Рассчитывает общую вместимость отверстий для шахматного распределения.
         /// </summary>
@@ -66,7 +65,6 @@ namespace BrickPluginModels.Services
             return evenRowsCount * columnsInEvenRows + oddRowsCount * columnsInOddRows;
         }
 
-        //TODO duplication +
         /// <summary>
         /// Рассчитывает максимальное количество отверстий для шахматного распределения.
         /// </summary>
@@ -86,7 +84,6 @@ namespace BrickPluginModels.Services
             return CalculateStaggeredCapacity(maxRows, availableArea);
         }
 
-        //TODO duplication +
         /// <summary>
         /// Проверяет, может ли заданное количество отверстий
         /// поместиться в указанное количество рядов.

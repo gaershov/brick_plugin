@@ -17,7 +17,6 @@ namespace BrickPlugin.Services
         /// <summary>
         /// Калькулятор распределения отверстий в кирпиче.
         /// </summary>
-        //TODO: RSDN +
         private readonly HoleDistributionCalculator _distributionCalculator;
 
         /// <summary>
