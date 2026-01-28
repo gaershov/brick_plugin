@@ -334,7 +334,6 @@ namespace BrickPluginModels.Models
             double maximumRadius = (width - 2 * MinimumEdgeMargin) / 2.0;
             if (holeRadius > maximumRadius)
             {
-                //TODO: RSDN +
                 errorMessage =
                     "• Радиус отверстий слишком большой для данной ширины кирпича";
                 return false;
@@ -358,7 +357,6 @@ namespace BrickPluginModels.Models
                 double maximumHoles = CalculateMaxHoles(length, width, holeRadius);
                 if (holesCount > maximumHoles)
                 {
-                    //TODO: RSDN +
                     string distributionType =
                         _distributionType == HoleDistributionType.Straight
                         ? "прямого"
@@ -382,7 +380,6 @@ namespace BrickPluginModels.Models
         private double CalculateMaxHoles(double length, double width, double holeRadius)
         {
             return _distributionType == HoleDistributionType.Straight
-                //TODO: RSDN +
                 ? _distributionCalculator.CalculateMaxHolesStraight(
                     length, width, holeRadius)
                 : _distributionCalculator.CalculateMaxHolesStaggered(

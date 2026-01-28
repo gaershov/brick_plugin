@@ -256,7 +256,6 @@ namespace BrickPluginUI
         /// </summary>
         /// <param name="sender">Источник события.</param>
         /// <param name="e">Аргументы события.</param>
-        /// //TODO: RSDN +
         private void OnBuildClick(object sender, EventArgs e)
         {
             if (!ValidateAllFieldsFilled())
@@ -328,7 +327,6 @@ namespace BrickPluginUI
         /// </summary>
         /// <param name="sender">Источник события.</param>
         /// <param name="e">Аргументы события.</param>
-        /// //TODO: refactor +
         private void OnCalculateVoidnessClick(object sender, EventArgs e)
         {
             if (!ValidateVoidnessInput(out double targetVoidness))

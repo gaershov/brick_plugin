@@ -17,7 +17,6 @@ namespace BrickPlugin.Services
         /// <summary>
         /// Калькулятор распределения отверстий в кирпиче.
         /// </summary>
-        //TODO: RSDN +
         private readonly HoleDistributionCalculator _distributionCalculator;
 
         /// <summary>
@@ -163,7 +162,6 @@ namespace BrickPlugin.Services
             double length,
             double width)
         {
-            //TODO: RSDN +
             var availableArea =
                 BrickParameters.CalculateAvailableArea(length, width, holeRadius);
             double holeDiameter = availableArea.diameter;

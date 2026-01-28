@@ -40,7 +40,6 @@ namespace BrickPluginModels.Services
             return Math.Max(1, columns) * Math.Max(1, rows);
         }
 
-        //TODO duplication +
         /// <summary>
         /// Рассчитывает общую вместимость отверстий для шахматного распределения.
         /// </summary>

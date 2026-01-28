@@ -87,7 +87,6 @@ namespace BrickPlugin.Tests
             });
         }
 
-        //TODO: RSDN +
         [Test]
         [Description("Изменение ширины обновляет максимальный радиус отверстия")]
         public void CalculateDependent_WhenWidthChanges_ShouldUpdateMaxRadius()
@@ -181,7 +180,6 @@ namespace BrickPlugin.Tests
             Assert.IsTrue(parameters.Validate());
         }
 
-        //TODO: RSDN +
         [TestCase(ParameterType.Length, 10000, "Длина")]
         [TestCase(ParameterType.Width, 10000, "Ширина")]
         [TestCase(ParameterType.Height, 10000, "Высота")]
@@ -411,7 +409,6 @@ namespace BrickPlugin.Tests
             Assert.IsTrue(eventRaised);
         }
 
-        //TODO: duplicatoin +
         [TestCase(HoleDistributionType.Straight, "прямого распределения")]
         [TestCase(HoleDistributionType.Staggered, "шахматного распределения")]
         [Description("ValidateBusinessRules проверяет превышение " +
